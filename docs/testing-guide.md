@@ -130,3 +130,34 @@ Current API quality coverage verifies:
 - Validation failures include field-level `validationErrors` details.
 
 Manual curl examples are demo scripts in `docs/youtube/04-error-handling-validation.md`. The important endpoint behavior is automated in `ApiErrorIntegrationTest` and `GlobalExceptionHandlerTest`.
+
+## Phase 5
+
+Run the full test suite:
+
+```bash
+mvn test
+```
+
+Run only the functional workflow tests:
+
+```bash
+mvn test -Dtest=OrderWorkflowIntegrationTest
+```
+
+Current integration and functional workflow coverage verifies:
+
+- Product creation through the HTTP API.
+- Order creation through the HTTP API.
+- Inventory deduction after order creation.
+- Product lookup after inventory changes.
+- Order item snapshots for product ID, SKU, name, unit price, quantity, and line total.
+- Order subtotal, fixed `8.25%` tax, and total during a full workflow.
+- Shipment creation through the HTTP API.
+- Order status transition from `CREATED` to `SHIPPED`.
+- Shipment persistence for carrier and tracking number.
+- Insufficient inventory workflows return `409` and do not deduct inventory, create orders, create order items, or create shipments.
+- Duplicate shipment workflows return `409` and keep one shipment record.
+- Invalid product payload workflows return `400` and do not persist products.
+
+Manual curl examples are demo scripts in `docs/youtube/05-integration-functional-testing.md`. The important workflow behavior is automated in `OrderWorkflowIntegrationTest`.

@@ -87,6 +87,20 @@ This phase includes:
 - Field-level validation details for request validation failures
 - Automated error response tests in `ApiErrorIntegrationTest` and `GlobalExceptionHandlerTest`
 
+## Phase 5 - Integration and Functional Testing
+
+Added unit, integration, and functional workflow tests covering product creation, order creation, inventory deduction, shipment creation, validation errors, and invalid state transitions.
+
+This phase includes:
+
+- Full product-to-order-to-shipment workflow coverage in `OrderWorkflowIntegrationTest`
+- End-to-end API tests using Spring Boot, MockMvc, services, repositories, validation, and H2 persistence together
+- Repository state assertions for inventory deduction, order creation, shipment creation, and failed workflow rollback behavior
+- Failure workflow tests proving invalid product payloads, insufficient inventory, and duplicate shipments return predictable errors without unwanted persistence changes
+- Documentation for running all tests or the focused workflow suite
+
+Manual workflow demo commands live in `docs/youtube/05-integration-functional-testing.md`.
+
 ## Package Structure
 
 ```text
@@ -219,6 +233,12 @@ Use JDBC URL `jdbc:h2:mem:retail_order_service`, user `sa`, and a blank password
 
 ```bash
 mvn test
+```
+
+Run only the Phase 5 workflow tests:
+
+```bash
+mvn test -Dtest=OrderWorkflowIntegrationTest
 ```
 
 ## Phase Completion Rule

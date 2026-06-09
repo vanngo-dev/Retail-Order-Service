@@ -65,3 +65,12 @@ Phase 4 centralizes API failure handling:
 - `ResourceNotFoundException` is the shared base type for missing API resources.
 - Domain exceptions stay focused on business meaning while HTTP status mapping lives in one handler.
 - Bean Validation messages are returned to clients with field-level `validationErrors` where applicable.
+
+## Phase 5 Integration and Functional Testing
+
+Phase 5 strengthens confidence in the layered architecture:
+
+- `OrderWorkflowIntegrationTest` runs full API workflows through controllers, services, repositories, validation, and H2 persistence.
+- Functional tests cover the user journey from product creation to order creation, inventory deduction, shipment creation, and final shipped status.
+- Failure workflow tests verify invalid requests and business conflicts return predictable errors without unwanted persistence changes.
+- Unit tests still cover isolated service rules, while integration and functional tests prove the layers work together.

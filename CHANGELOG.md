@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 5 - Integration and Functional Testing
+
+- Added `OrderWorkflowIntegrationTest`.
+- Added full product-to-order-to-shipment workflow coverage.
+- Verified inventory deduction, order totals, item snapshots, shipment persistence, and shipped status in one end-to-end flow.
+- Added failure workflow coverage for insufficient inventory, duplicate shipment, and invalid product payloads.
+- Documented the focused workflow test command.
+- Updated README and project documentation.
+
 ## Phase 4 - Error Handling and Validation
 
 - Added `ErrorResponse` DTO for standard API error payloads.
