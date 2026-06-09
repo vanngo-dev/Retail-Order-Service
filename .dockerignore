@@ -1,0 +1,14 @@
+.git
+.gitignore
+.idea
+.vscode
+target
+*.iml
+*.log
+*.pid
+hs_err_pid*
+replay_pid*
+docs
+README.md
+CHANGELOG.md
+java_spring_boot_retail_order_service_portfolio_spec.md

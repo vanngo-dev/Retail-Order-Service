@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: retail-order-service-postgres
+    environment:
+      POSTGRES_DB: retail_order_service
+      POSTGRES_USER: retail_order_user
+      POSTGRES_PASSWORD: retail_order_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U retail_order_user -d retail_order_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  retail-order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: retail-order-service-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/retail_order_service
+      SPRING_DATASOURCE_USERNAME: retail_order_user
+      SPRING_DATASOURCE_PASSWORD: retail_order_password
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:

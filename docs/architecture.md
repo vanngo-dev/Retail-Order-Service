@@ -83,3 +83,14 @@ Phase 6 proves the API fails safely:
 - Tests assert both the API error response and the persisted state after failure.
 - Failed requests should not create unwanted products, orders, order items, shipments, or inventory deductions.
 - Resilience coverage stays test-focused; no Docker, CI, security, or performance infrastructure is introduced in this phase.
+
+## Phase 7 Docker and PostgreSQL Profile
+
+Phase 7 adds a second runtime mode without changing local defaults:
+
+- Local development uses `application.yml` with in-memory H2.
+- Docker Compose uses `application-docker.yml` with PostgreSQL.
+- The `retail-order-service` container starts with `SPRING_PROFILES_ACTIVE=docker`.
+- The `postgres` service provides the database for containerized runs.
+- H2 console remains available in local mode and is disabled in the Docker profile.
+- Docker support is runtime packaging only; CI/CD remains planned for a later phase.

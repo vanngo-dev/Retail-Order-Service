@@ -147,3 +147,49 @@ Check the basics first:
 - Re-run `mvn test -Dtest=DestructiveApiIntegrationTest` to isolate destructive test failures from the full suite.
 
 Phase 6 does not add performance or load testing. Timeout troubleshooting here is limited to local development and demo reliability.
+
+## Docker Build Fails
+
+Check that Docker is installed and running:
+
+```bash
+docker --version
+docker compose version
+```
+
+Then retry:
+
+```bash
+docker build -t retail-order-service .
+```
+
+If the build fails while downloading base images or Maven dependencies, check network access and retry once the connection is available.
+
+## Docker Compose App Cannot Connect to PostgreSQL
+
+Start both services through Compose so the service names resolve correctly:
+
+```bash
+docker compose up --build
+```
+
+The app container should use:
+
+```text
+SPRING_PROFILES_ACTIVE=docker
+SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/retail_order_service
+```
+
+Stop and remove the containers when finished:
+
+```bash
+docker compose down
+```
+
+If the database volume contains stale local data, remove it intentionally with:
+
+```bash
+docker compose down -v
+```
+
+Only use `-v` when you are comfortable deleting the local PostgreSQL volume.

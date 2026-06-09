@@ -1,5 +1,16 @@
 # Changelog
 
+## Phase 7 - Docker and PostgreSQL
+
+- Added `Dockerfile`.
+- Added `.dockerignore`.
+- Added `docker-compose.yml` with app and PostgreSQL services.
+- Added `application-docker.yml` for the PostgreSQL-backed Docker profile.
+- Added PostgreSQL JDBC runtime dependency.
+- Preserved H2 as the default local development database.
+- Documented Docker build, Compose startup, verification, and shutdown commands.
+- Updated README and project documentation.
+
 ## Phase 6 - Destructive and Resilience Testing
 
 - Added `DestructiveApiIntegrationTest`.

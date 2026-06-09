@@ -10,9 +10,11 @@ Retail Order Service is a production-style Java/Spring Boot backend API that mod
 - Spring Web
 - Spring Data JPA
 - H2 Database
+- PostgreSQL
 - Spring Validation
 - Spring Boot Actuator
 - JUnit 5 and Spring Boot Test
+- Docker and Docker Compose
 
 ## Phase 0 - Project Setup
 
@@ -117,6 +119,22 @@ This phase includes:
 - Timeout and error troubleshooting notes
 
 Manual destructive demo commands live in `docs/youtube/06-destructive-testing.md`.
+
+## Phase 7 - Docker and PostgreSQL
+
+Added Docker support and a PostgreSQL-backed Docker Compose profile. The application can run locally with H2 or in containers with PostgreSQL.
+
+This phase includes:
+
+- `Dockerfile` for building and running the Spring Boot jar
+- `.dockerignore` for cleaner Docker build context
+- `docker-compose.yml` with `retail-order-service` and `postgres` services
+- `application-docker.yml` Spring profile for PostgreSQL
+- PostgreSQL JDBC driver as a runtime dependency
+- H2 preserved as the default local development database
+- Documentation for Docker build, Compose startup, health checks, and shutdown
+
+Manual Docker demo commands live in `docs/youtube/07-docker-postgresql.md`.
 
 ## Package Structure
 
@@ -232,6 +250,8 @@ Detailed manual demo commands live in `docs/youtube/04-error-handling-validation
 
 ## How to Run
 
+Local H2 mode:
+
 ```bash
 mvn spring-boot:run
 ```
@@ -245,6 +265,35 @@ http://localhost:8080/h2-console
 ```
 
 Use JDBC URL `jdbc:h2:mem:retail_order_service`, user `sa`, and a blank password.
+
+## How to Run with Docker
+
+Build the image:
+
+```bash
+docker build -t retail-order-service .
+```
+
+Start the app with PostgreSQL:
+
+```bash
+docker compose up --build
+```
+
+Verify:
+
+```bash
+curl http://localhost:8080/actuator/health
+curl http://localhost:8080/products
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+Docker Compose runs the app with the `docker` Spring profile and PostgreSQL. Local `mvn spring-boot:run` still uses H2 by default.
 
 ## How to Test
 

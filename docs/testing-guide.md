@@ -192,3 +192,21 @@ Current destructive and resilience coverage verifies:
 - Cancelled order shipment attempts return `409` and do not create shipments.
 
 Manual curl examples are demo scripts in `docs/youtube/06-destructive-testing.md`. The important destructive behavior is automated in `DestructiveApiIntegrationTest`.
+
+## Phase 7
+
+Run the full test suite:
+
+```bash
+mvn test
+```
+
+Current Docker and PostgreSQL profile checks verify:
+
+- Default local tests still use H2.
+- `mvn test` still passes with the PostgreSQL runtime dependency present.
+- Docker Compose configuration defines the `retail-order-service` and `postgres` services.
+- Docker Compose configuration starts the app with `SPRING_PROFILES_ACTIVE=docker`.
+- The `docker` Spring profile points to PostgreSQL and disables the H2 console.
+
+Manual Docker commands are demo and environment verification steps in `docs/youtube/07-docker-postgresql.md`. Automated tests remain the main verification for application behavior.
