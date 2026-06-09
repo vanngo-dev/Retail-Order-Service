@@ -9,6 +9,8 @@ import com.example.retailorderservice.exception.ProductNotFoundException;
 import com.example.retailorderservice.mapper.ProductMapper;
 import com.example.retailorderservice.repository.ProductRepository;
 import java.math.BigDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import org.springframework.util.StringUtils;
 @Service
 @Transactional
 public class ProductService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
 
     private final ProductRepository productRepository;
 
@@ -57,6 +61,7 @@ public class ProductService {
         validatePriceAndQuantity(request.price(), request.quantityAvailable());
 
         if (productRepository.existsBySkuIgnoreCase(sku)) {
+            LOGGER.warn("Duplicate product SKU rejected: sku={}", sku);
             throw new DuplicateSkuException(sku);
         }
 
@@ -69,7 +74,15 @@ public class ProductService {
                 request.active() == null || request.active()
         );
 
-        return ProductMapper.toResponse(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+        LOGGER.info(
+                "Product created: productId={}, sku={}, active={}, quantityAvailable={}",
+                savedProduct.getId(),
+                savedProduct.getSku(),
+                savedProduct.isActive(),
+                savedProduct.getQuantityAvailable()
+        );
+        return ProductMapper.toResponse(savedProduct);
     }
 
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
@@ -78,6 +91,7 @@ public class ProductService {
         validatePriceAndQuantity(request.price(), request.quantityAvailable());
 
         if (productRepository.existsBySkuIgnoreCaseAndIdNot(sku, id)) {
+            LOGGER.warn("Duplicate product SKU rejected during update: productId={}, sku={}", id, sku);
             throw new DuplicateSkuException(sku);
         }
 

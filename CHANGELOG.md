@@ -1,5 +1,15 @@
 # Changelog
 
+## Phase 9 - Logging, Monitoring, Health Checks, and Diagnostics
+
+- Added structured key-value service logs for product creation, order creation, inventory deduction, shipment creation, and selected business failures.
+- Added warning logs for duplicate SKU, inactive product, insufficient inventory, and invalid shipment state attempts.
+- Exposed Actuator `health` and `info` endpoints.
+- Enabled liveness and readiness health probes.
+- Added application metadata under `/actuator/info`.
+- Added automated tests for diagnostic endpoints and representative log output.
+- Updated README and project documentation.
+
 ## Phase 8 - GitHub Actions CI/CD
 
 - Added GitHub Actions CI workflow at `.github/workflows/ci.yml`.

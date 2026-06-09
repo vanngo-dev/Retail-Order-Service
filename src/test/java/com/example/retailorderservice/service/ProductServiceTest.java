@@ -18,10 +18,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ProductServiceTest {
 
     @Mock
@@ -35,7 +37,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void createsValidProduct() {
+    void createsValidProduct(CapturedOutput output) {
         CreateProductRequest request = createRequest("HAMMER-001", "Steel Hammer", "19.99", 100);
 
         when(productRepository.existsBySkuIgnoreCase("HAMMER-001")).thenReturn(false);
@@ -48,6 +50,7 @@ class ProductServiceTest {
         assertThat(response.price()).isEqualByComparingTo("19.99");
         assertThat(response.quantityAvailable()).isEqualTo(100);
         assertThat(response.active()).isTrue();
+        assertThat(output).contains("Product created: productId=").contains("sku=HAMMER-001");
         verify(productRepository).save(any(Product.class));
     }
 

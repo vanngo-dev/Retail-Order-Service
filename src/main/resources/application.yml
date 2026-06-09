@@ -20,7 +20,24 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,info
   endpoint:
     health:
       show-details: never
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: retail-order-service
+    description: Retail order workflow API
+    version: 0.0.1-SNAPSHOT
+    phase: "9"
+    diagnostics: health,info
+
+logging:
+  level:
+    com.example.retailorderservice: INFO

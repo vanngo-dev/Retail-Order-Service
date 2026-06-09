@@ -235,3 +235,31 @@ Current CI/CD checks verify:
 - CI verifies the packaged Spring Boot jar exists.
 
 Manual CI walkthrough notes live in `docs/youtube/08-github-actions-ci.md`. The automated GitHub Actions workflow is the main verification for pull request and push checks.
+
+## Phase 9
+
+Run the full test suite:
+
+```bash
+mvn test
+```
+
+Run only the diagnostic endpoint tests:
+
+```bash
+mvn test -Dtest=HealthControllerTest
+```
+
+Current logging and diagnostics coverage verifies:
+
+- `GET /actuator/health` returns `UP`.
+- `GET /actuator/health/liveness` returns `UP`.
+- `GET /actuator/health/readiness` returns `UP`.
+- `GET /actuator/info` returns service metadata.
+- Product creation emits a structured service log.
+- Order creation emits structured order and inventory logs.
+- Shipment creation emits a structured shipment log.
+- Insufficient inventory emits a warning log.
+- Invalid shipment state emits a warning log.
+
+Manual diagnostic curl commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`. Automated tests remain the main verification for phase behavior.

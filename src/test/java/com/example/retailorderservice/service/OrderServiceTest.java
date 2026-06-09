@@ -34,9 +34,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class OrderServiceTest {
 
     @Mock
@@ -56,7 +58,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void createsOrderWithOneItem() {
+    void createsOrderWithOneItem(CapturedOutput output) {
         Product product = product(1L, "HAMMER-001", "Steel Hammer", "19.99", 10, true);
         CreateOrderRequest request = orderRequest("customer@example.com", item(1L, 2));
 
@@ -76,6 +78,11 @@ class OrderServiceTest {
         assertThat(response.items().get(0).productNameSnapshot()).isEqualTo("Steel Hammer");
         assertThat(response.items().get(0).unitPriceSnapshot()).isEqualByComparingTo("19.99");
         assertThat(response.items().get(0).lineTotal()).isEqualByComparingTo("39.98");
+        assertThat(output)
+                .contains("Inventory deducted: productId=1, quantityDeducted=2, quantityAvailable=8")
+                .contains("Order created: orderId=")
+                .contains("itemCount=1")
+                .contains("total=43.28");
         verify(orderRepository).save(any(Order.class));
     }
 
@@ -142,7 +149,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void rejectsInsufficientInventory() {
+    void rejectsInsufficientInventory(CapturedOutput output) {
         Product product = product(1L, "HAMMER-001", "Steel Hammer", "19.99", 1, true);
         CreateOrderRequest request = orderRequest("customer@example.com", item(1L, 2));
 
@@ -151,6 +158,8 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.createOrder(request))
                 .isInstanceOf(InsufficientInventoryException.class)
                 .hasMessageContaining("requested 2, available 1");
+        assertThat(output)
+                .contains("Insufficient inventory: productId=1, requestedQuantity=2, availableQuantity=1");
         verify(orderRepository, never()).save(any(Order.class));
     }
 
@@ -168,7 +177,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void shipsValidOrder() {
+    void shipsValidOrder(CapturedOutput output) {
         Order order = order(1L);
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
@@ -182,6 +191,7 @@ class OrderServiceTest {
         assertThat(response.trackingNumber()).isEqualTo("1Z999999999");
         assertThat(response.shippedAt()).isNotNull();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.SHIPPED);
+        assertThat(output).contains("Shipment created: shipmentId=").contains("orderId=1, carrier=UPS");
         verify(shipmentRepository).save(any(Shipment.class));
     }
 
@@ -196,7 +206,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void rejectsAlreadyShippedOrder() {
+    void rejectsAlreadyShippedOrder(CapturedOutput output) {
         Order order = order(1L);
         order.markShipped();
 
@@ -205,6 +215,8 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.shipOrder(1L, shipRequest("UPS", "1Z999999999")))
                 .isInstanceOf(InvalidOrderStateException.class)
                 .hasMessageContaining("already been shipped");
+        assertThat(output)
+                .contains("Invalid order state attempted: orderId=1, status=SHIPPED, reason=already-shipped");
         verify(shipmentRepository, never()).save(any(Shipment.class));
     }
 

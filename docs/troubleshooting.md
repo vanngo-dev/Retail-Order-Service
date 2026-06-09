@@ -29,18 +29,9 @@ mvn -version
 
 ## Health Endpoint Does Not Respond
 
-Start the app:
+Confirm the app is running, then check the custom health endpoint at `/health` and the Actuator health endpoint at `/actuator/health`.
 
-```bash
-mvn spring-boot:run
-```
-
-Then verify:
-
-```bash
-curl http://localhost:8080/actuator/health
-curl http://localhost:8080/health
-```
+Manual diagnostic curl commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
 
 ## H2 Console Cannot Connect
 
@@ -229,3 +220,34 @@ Common local causes:
 - Offline mode is enabled before the required package plugins are fully cached.
 
 Fix the local Maven cache permissions or rerun with network access so Maven can download the missing plugin metadata. GitHub Actions uses a fresh hosted runner and Maven cache, so it can download these build plugins during CI.
+
+## Actuator Info Endpoint Is Empty or Missing
+
+Check `application.yml`:
+
+- `/actuator/info` must be included in `management.endpoints.web.exposure.include`.
+- `management.info.env.enabled` must be `true`.
+- Service metadata should live under the `info.app` configuration key.
+
+Phase 9 exposes only health and info diagnostics. Metrics remain out of scope for this phase.
+
+## Expected Service Logs Do Not Appear
+
+Check that the application log level includes the service package:
+
+```yaml
+logging:
+  level:
+    com.example.retailorderservice: INFO
+```
+
+Expected Phase 9 service logs include:
+
+- `Product created`
+- `Order created`
+- `Inventory deducted`
+- `Shipment created`
+- `Insufficient inventory`
+- `Invalid order state attempted`
+
+Avoid adding customer email, full payloads, passwords, or shipment tracking numbers to routine logs.

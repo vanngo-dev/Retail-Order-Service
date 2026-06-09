@@ -105,3 +105,16 @@ Phase 8 adds automated repository checks:
 - CI runs `mvn test` to prove the automated test suite.
 - CI runs `mvn package` and verifies the Spring Boot jar exists.
 - The workflow stops at build, test, and package verification; it does not deploy the application.
+
+## Phase 9 Logging and Monitoring
+
+Phase 9 adds basic production diagnostics:
+
+- Services emit structured key-value logs for product creation, order creation, inventory deduction, shipment creation, and selected business failures.
+- Successful business events use `INFO`.
+- Business conflicts that help root-cause failed workflows use `WARN`.
+- Logs avoid unnecessary sensitive values such as customer email and shipment tracking numbers.
+- Actuator exposes `health` and `info` endpoints.
+- Health probes expose liveness and readiness status for container and cloud-style runtime checks.
+- `/actuator/info` returns stable service metadata from application configuration.
+- Diagnostics do not change business API behavior.

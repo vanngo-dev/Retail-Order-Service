@@ -15,6 +15,7 @@ Retail Order Service is a production-style Java/Spring Boot backend API that mod
 - PostgreSQL
 - Spring Validation
 - Spring Boot Actuator
+- SLF4J and Logback logging
 - JUnit 5 and Spring Boot Test
 - Docker and Docker Compose
 - GitHub Actions
@@ -154,6 +155,22 @@ This phase includes:
 - Packaged jar verification
 - CI status badge in the README
 
+## Phase 9 - Logging and Monitoring
+
+Added production-oriented logging and Spring Boot Actuator endpoints for health and service diagnostics. This demonstrates basic observability and production support readiness.
+
+This phase includes:
+
+- Structured key-value service logs for product creation, order creation, inventory deduction, shipment creation, and selected business failures
+- `INFO` logs for successful business events
+- `WARN` logs for duplicate SKU, inactive product, insufficient inventory, and invalid shipment state attempts
+- Actuator exposure for `/actuator/health` and `/actuator/info`
+- Liveness and readiness health probes
+- Application metadata under `/actuator/info`
+- Automated tests for diagnostic endpoints and representative log output
+
+Manual diagnostic demo commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
+
 ## Package Structure
 
 ```text
@@ -202,6 +219,16 @@ Example response:
   "status": "UP"
 }
 ```
+
+Additional diagnostic endpoints:
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/actuator/health/liveness` | Check whether the app process is alive |
+| GET | `/actuator/health/readiness` | Check whether the app is ready to receive traffic |
+| GET | `/actuator/info` | Return service metadata |
+
+Manual diagnostic demo commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
 
 ### Products
 
@@ -329,6 +356,12 @@ Run only the Phase 6 destructive tests:
 
 ```bash
 mvn test -Dtest=DestructiveApiIntegrationTest
+```
+
+Run only the diagnostic endpoint tests:
+
+```bash
+mvn test -Dtest=HealthControllerTest
 ```
 
 Package the application locally:

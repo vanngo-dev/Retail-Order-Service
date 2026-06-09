@@ -33,4 +33,29 @@ class HealthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
     }
+
+    @Test
+    void actuatorLivenessEndpointReturnsUpStatus() throws Exception {
+        mockMvc.perform(get("/actuator/health/liveness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
+    void actuatorReadinessEndpointReturnsUpStatus() throws Exception {
+        mockMvc.perform(get("/actuator/health/readiness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
+    void actuatorInfoEndpointReturnsServiceMetadata() throws Exception {
+        mockMvc.perform(get("/actuator/info"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.app.name").value("retail-order-service"))
+                .andExpect(jsonPath("$.app.description").value("Retail order workflow API"))
+                .andExpect(jsonPath("$.app.version").value("0.0.1-SNAPSHOT"))
+                .andExpect(jsonPath("$.app.phase").value("9"))
+                .andExpect(jsonPath("$.app.diagnostics").value("health,info"));
+    }
 }

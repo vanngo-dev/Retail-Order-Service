@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,7 @@ import org.springframework.util.StringUtils;
 @Transactional
 public class OrderService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderService.class);
     private static final BigDecimal TAX_RATE = new BigDecimal("0.0825");
 
     private final OrderRepository orderRepository;
@@ -95,9 +98,19 @@ public class OrderService {
 
         Order order = new Order(generateOrderNumber(), customerEmail, subtotal, tax, total);
         requestedItems.forEach(item -> addOrderItem(order, productsById.get(item.productId()), item.quantity()));
-        requestedQuantitiesByProductId.forEach((productId, quantity) -> productsById.get(productId).deductInventory(quantity));
+        requestedQuantitiesByProductId.forEach((productId, quantity) -> deductInventory(productsById.get(productId), quantity));
 
-        return OrderMapper.toResponse(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        LOGGER.info(
+                "Order created: orderId={}, orderNumber={}, itemCount={}, subtotal={}, tax={}, total={}",
+                savedOrder.getId(),
+                savedOrder.getOrderNumber(),
+                savedOrder.getItems().size(),
+                savedOrder.getSubtotal(),
+                savedOrder.getTax(),
+                savedOrder.getTotal()
+        );
+        return OrderMapper.toResponse(savedOrder);
     }
 
     public ShipmentResponse shipOrder(Long orderId, ShipOrderRequest request) {
@@ -110,7 +123,14 @@ public class OrderService {
         Shipment shipment = new Shipment(order, carrier, trackingNumber, Instant.now());
         order.markShipped();
 
-        return ShipmentMapper.toResponse(shipmentRepository.save(shipment));
+        Shipment savedShipment = shipmentRepository.save(shipment);
+        LOGGER.info(
+                "Shipment created: shipmentId={}, orderId={}, carrier={}",
+                savedShipment.getId(),
+                order.getId(),
+                savedShipment.getCarrier()
+        );
+        return ShipmentMapper.toResponse(savedShipment);
     }
 
     private Order findOrder(Long id) {
@@ -160,23 +180,43 @@ public class OrderService {
 
     private static void validateProductCanBeOrdered(Product product, int requestedQuantity) {
         if (!product.isActive()) {
+            LOGGER.warn("Inactive product order rejected: productId={}", product.getId());
             throw new ProductInactiveException(product.getId());
         }
         if (product.getQuantityAvailable() < requestedQuantity) {
+            LOGGER.warn(
+                    "Insufficient inventory: productId={}, requestedQuantity={}, availableQuantity={}",
+                    product.getId(),
+                    requestedQuantity,
+                    product.getQuantityAvailable()
+            );
             throw new InsufficientInventoryException(product.getId(), requestedQuantity, product.getQuantityAvailable());
         }
     }
 
     private void validateOrderCanBeShipped(Order order) {
         if (order.getStatus() == OrderStatus.SHIPPED || shipmentRepository.existsByOrder_Id(order.getId())) {
+            LOGGER.warn("Invalid order state attempted: orderId={}, status={}, reason=already-shipped", order.getId(), order.getStatus());
             throw new InvalidOrderStateException("Order has already been shipped: " + order.getId());
         }
         if (order.getStatus() == OrderStatus.CANCELLED) {
+            LOGGER.warn("Invalid order state attempted: orderId={}, status={}, reason=cancelled", order.getId(), order.getStatus());
             throw new InvalidOrderStateException("Cancelled order cannot be shipped: " + order.getId());
         }
         if (order.getStatus() != OrderStatus.CREATED) {
+            LOGGER.warn("Invalid order state attempted: orderId={}, status={}, reason=not-created", order.getId(), order.getStatus());
             throw new InvalidOrderStateException("Only CREATED orders can be shipped: " + order.getId());
         }
+    }
+
+    private static void deductInventory(Product product, int quantity) {
+        product.deductInventory(quantity);
+        LOGGER.info(
+                "Inventory deducted: productId={}, quantityDeducted={}, quantityAvailable={}",
+                product.getId(),
+                quantity,
+                product.getQuantityAvailable()
+        );
     }
 
     private static BigDecimal calculateSubtotal(List<CreateOrderItemRequest> items, Map<Long, Product> productsById) {
