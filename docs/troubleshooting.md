@@ -135,3 +135,15 @@ Check that the request body is valid JSON:
 ## Request Returns 500 Internal Server Error
 
 The API hides unexpected server details behind a generic message. Check the application logs for the stack trace, fix the underlying issue, and add a regression test if the failure represents a missing business or validation rule.
+
+## Request Times Out or Test Appears to Hang
+
+Check the basics first:
+
+- Confirm the app is running before manual curl tests.
+- Confirm the request URL points to `http://localhost:8080`.
+- Confirm the JSON body is complete and the terminal command closed all quotes.
+- Check the application logs for long-running requests or startup failures.
+- Re-run `mvn test -Dtest=DestructiveApiIntegrationTest` to isolate destructive test failures from the full suite.
+
+Phase 6 does not add performance or load testing. Timeout troubleshooting here is limited to local development and demo reliability.

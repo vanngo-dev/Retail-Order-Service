@@ -74,3 +74,12 @@ Phase 5 strengthens confidence in the layered architecture:
 - Functional tests cover the user journey from product creation to order creation, inventory deduction, shipment creation, and final shipped status.
 - Failure workflow tests verify invalid requests and business conflicts return predictable errors without unwanted persistence changes.
 - Unit tests still cover isolated service rules, while integration and functional tests prove the layers work together.
+
+## Phase 6 Destructive and Resilience Testing
+
+Phase 6 proves the API fails safely:
+
+- `DestructiveApiIntegrationTest` intentionally sends bad JSON, invalid payloads, invalid IDs, duplicate operations, inventory conflicts, inactive product orders, and invalid shipment state transitions.
+- Tests assert both the API error response and the persisted state after failure.
+- Failed requests should not create unwanted products, orders, order items, shipments, or inventory deductions.
+- Resilience coverage stays test-focused; no Docker, CI, security, or performance infrastructure is introduced in this phase.

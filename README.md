@@ -101,6 +101,23 @@ This phase includes:
 
 Manual workflow demo commands live in `docs/youtube/05-integration-functional-testing.md`.
 
+## Phase 6 - Destructive and Resilience Testing
+
+Added destructive tests that intentionally send invalid payloads, bad IDs, duplicate operations, insufficient inventory cases, and invalid order state transitions. These tests demonstrate how the API fails safely and predictably.
+
+This phase includes:
+
+- Destructive API coverage in `DestructiveApiIntegrationTest`
+- Malformed JSON, missing fields, invalid values, and invalid path ID tests
+- Duplicate SKU and duplicate shipment tests
+- Nonexistent product and order ID tests
+- Inactive product and insufficient inventory tests
+- Cancelled order shipment tests
+- State-safety assertions proving failed requests do not create unwanted products, orders, order items, shipments, or inventory deductions
+- Timeout and error troubleshooting notes
+
+Manual destructive demo commands live in `docs/youtube/06-destructive-testing.md`.
+
 ## Package Structure
 
 ```text
@@ -239,6 +256,12 @@ Run only the Phase 5 workflow tests:
 
 ```bash
 mvn test -Dtest=OrderWorkflowIntegrationTest
+```
+
+Run only the Phase 6 destructive tests:
+
+```bash
+mvn test -Dtest=DestructiveApiIntegrationTest
 ```
 
 ## Phase Completion Rule

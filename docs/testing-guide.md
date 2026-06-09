@@ -161,3 +161,34 @@ Current integration and functional workflow coverage verifies:
 - Invalid product payload workflows return `400` and do not persist products.
 
 Manual curl examples are demo scripts in `docs/youtube/05-integration-functional-testing.md`. The important workflow behavior is automated in `OrderWorkflowIntegrationTest`.
+
+## Phase 6
+
+Run the full test suite:
+
+```bash
+mvn test
+```
+
+Run only the destructive and resilience tests:
+
+```bash
+mvn test -Dtest=DestructiveApiIntegrationTest
+```
+
+Current destructive and resilience coverage verifies:
+
+- Malformed JSON returns `400` and does not persist products.
+- Missing SKU, missing name, zero price, negative price, and negative quantity return `400`.
+- Duplicate SKU returns `409` and keeps only the original product.
+- Null customer email, bad email format, empty order items, and zero item quantity return `400`.
+- Nonexistent product IDs return `404` and do not create orders or order items.
+- Insufficient inventory returns `409` and does not deduct inventory.
+- Inactive product order attempts return `409` and do not create orders or deduct inventory.
+- Invalid path IDs return `400`.
+- Missing shipment carrier and missing tracking number return `400` and keep the order in `CREATED`.
+- Nonexistent order shipment attempts return `404` and do not create shipments.
+- Duplicate shipment attempts return `409` and keep the original shipment.
+- Cancelled order shipment attempts return `409` and do not create shipments.
+
+Manual curl examples are demo scripts in `docs/youtube/06-destructive-testing.md`. The important destructive behavior is automated in `DestructiveApiIntegrationTest`.

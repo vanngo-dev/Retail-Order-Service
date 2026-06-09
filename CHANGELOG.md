@@ -1,5 +1,15 @@
 # Changelog
 
+## Phase 6 - Destructive and Resilience Testing
+
+- Added `DestructiveApiIntegrationTest`.
+- Added destructive coverage for malformed JSON, invalid product payloads, invalid order payloads, invalid shipment payloads, invalid path IDs, and nonexistent resources.
+- Added duplicate SKU and duplicate shipment resilience checks.
+- Added inventory edge case coverage for insufficient inventory and inactive products.
+- Added invalid order state coverage for cancelled order shipment attempts.
+- Verified failed requests do not create unwanted persisted state.
+- Documented the focused destructive test command and troubleshooting notes.
+
 ## Phase 5 - Integration and Functional Testing
 
 - Added `OrderWorkflowIntegrationTest`.
