@@ -15,7 +15,48 @@ Layers:
 - `mapper`: conversions between entities and DTOs
 - `exception`: API and business exception handling
 - `config`: application configuration
-- `security`: security configuration planned for a later phase
+- `security`: Spring Security configuration and role-based endpoint protection
+
+## Final Architecture Snapshot
+
+Request flow:
+
+```text
+HTTP request
+  -> Controller
+  -> Validated request DTO
+  -> Service business workflow
+  -> Repository
+  -> JPA entity
+  -> Mapper
+  -> Response DTO
+  -> HTTP response
+```
+
+Cross-cutting concerns:
+
+- Bean Validation protects request payloads before service logic runs.
+- `GlobalExceptionHandler` turns validation and business failures into consistent API errors.
+- Spring Security protects write operations while leaving health, diagnostics, and read endpoints public for the demo.
+- Service methods own transaction boundaries for order creation, inventory deduction, and shipment creation.
+- Actuator, structured logs, GitHub Actions, Docker Compose, and k6 scripts demonstrate production support exposure around the core API.
+
+## Database Model
+
+| Entity | Table | Relationship |
+|---|---|---|
+| `Product` | `products` | Referenced by order items through a snapshotted `productId` value |
+| `Order` | `orders` | Owns many `OrderItem` rows |
+| `OrderItem` | `order_items` | Belongs to one order and stores product SKU, name, and price snapshots |
+| `Shipment` | `shipments` | One-to-one with an order |
+
+Important modeling choices:
+
+- Product deletes are soft deletes by setting `active` to `false`.
+- Order items snapshot product data so historical orders stay stable when products change.
+- Order totals are calculated server-side with a simplified fixed `8.25%` demo tax rate.
+- Shipping creates a shipment row and changes order status in one operation.
+- The default local database is H2; Docker Compose uses PostgreSQL through the `docker` Spring profile.
 
 ## Phase 0 Baseline
 
@@ -93,7 +134,7 @@ Phase 7 adds a second runtime mode without changing local defaults:
 - The `retail-order-service` container starts with `SPRING_PROFILES_ACTIVE=docker`.
 - The `postgres` service provides the database for containerized runs.
 - H2 console remains available in local mode and is disabled in the Docker profile.
-- Docker support is runtime packaging only; deployment automation remains planned for a later phase.
+- Docker support is runtime packaging only; CI build and package checks are added in Phase 8, while production deployment remains out of scope.
 
 ## Phase 8 GitHub Actions CI/CD
 
@@ -145,3 +186,12 @@ Phase 11 adds performance testing artifacts outside the Spring Boot application:
 - Scripts use the Phase 10 HTTP Basic demo users for protected write operations.
 - Baseline expectations document request volume, average response time, p95 response time, and error rate.
 - Performance scripts are operational test assets and do not change application business behavior.
+
+## Phase 12 Final Portfolio Polish
+
+Phase 12 turns the completed service into a presentable portfolio project:
+
+- README is organized around architecture, workflow, endpoints, runtime modes, testing, security, observability, CI/CD, troubleshooting, lessons learned, and future improvements.
+- A final demo script documents the complete product-to-order-to-shipment walkthrough.
+- Portfolio wording explains the project for GitHub, resume bullets, LinkedIn, and interview discussion.
+- Documentation is cleaned up so protected write examples use the Phase 10 demo credentials.

@@ -1,5 +1,15 @@
 # Changelog
 
+## Phase 12 - Final Documentation and Portfolio Polish
+
+- Reorganized the README into a final portfolio-ready structure.
+- Added a final YouTube/demo walkthrough script for the complete product-to-order-to-shipment flow.
+- Added a portfolio summary with resume, LinkedIn, and interview talking points.
+- Added final architecture and database model documentation.
+- Updated reusable API examples so protected write requests include Phase 10 demo credentials.
+- Added final troubleshooting notes for demo readiness and protected write requests.
+- Updated `/actuator/info` metadata to report the completed Phase 12 project state.
+
 ## Phase 11 - Performance Testing
 
 - Added k6 performance smoke scripts under `performance/k6`.

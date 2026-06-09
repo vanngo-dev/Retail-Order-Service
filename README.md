@@ -2,390 +2,133 @@
 
 [![CI](https://github.com/vanngo-dev/Retail-Order-Service/actions/workflows/ci.yml/badge.svg)](https://github.com/vanngo-dev/Retail-Order-Service/actions/workflows/ci.yml)
 
-Retail Order Service is a production-style Java/Spring Boot backend API that models a simplified retail order workflow. The project is built phase by phase to demonstrate backend engineering skills in REST API development, SQL persistence, validation, testing, source control, and production readiness.
+## Overview
+
+Retail Order Service is a production-style Java/Spring Boot backend API that models a simplified retail workflow for products, orders, inventory, and shipments.
+
+This project demonstrates my ability to build and support production-style backend services using Java, Spring Boot, SQL, REST APIs, validation, testing, Docker, CI/CD, logging, monitoring, and security fundamentals. The domain models a realistic retail workflow with products, orders, inventory, and shipments, making it relevant to business software and retail technology environments.
+
+## Why This Project Exists
+
+This project was built as a portfolio-ready backend service for Software Engineer II applications, technical interviews, GitHub review, and YouTube/demo walkthroughs. It is intentionally scoped as a realistic service rather than a toy CRUD app: orders depend on product state, inventory is validated and deducted, shipment is a business operation, and failure cases are covered with automated tests.
+
+The work was completed in phases so each milestone stayed runnable, tested, documented, and ready for a Git commit before the next phase began.
 
 ## Tech Stack
 
 - Java 21
-- Spring Boot 3.x
+- Spring Boot 3.3.x
 - Maven
 - Spring Web
 - Spring Data JPA
-- H2 Database
-- PostgreSQL
 - Spring Validation
 - Spring Security
 - Spring Boot Actuator
+- H2 for default local development
+- PostgreSQL for Docker Compose
+- JUnit 5, Spring Boot Test, MockMvc, and Spring Security Test
 - SLF4J and Logback logging
-- JUnit 5 and Spring Boot Test
 - Docker and Docker Compose
 - GitHub Actions
 - k6 performance scripts
 
-## Phase 0 - Project Setup
+## Architecture
 
-Completed baseline Spring Boot project setup with Java 21, Maven, Spring Web, JPA, H2, Validation, Actuator, and test dependencies.
+The application uses a layered Spring Boot architecture under `com.example.retailorderservice`.
 
-This phase includes:
-
-- Spring Boot application entrypoint under `com.example.retailorderservice`
-- Base package structure for controllers, DTOs, entities, repositories, services, mappers, exceptions, config, and security
-- In-memory H2 datasource configuration for local development
-- Actuator health endpoint at `GET /actuator/health`
-- Custom service health endpoint at `GET /health`
-- Starter tests for application context, custom health, and Actuator health
-- Starter documentation and Git-ready project hygiene
-
-## Phase 1 - Product API
-
-Implemented product management with JPA persistence, validation, DTOs, service layer, controller layer, unique SKU handling, and soft delete behavior.
-
-This phase includes:
-
-- `Product` JPA entity with SKU, name, description, price, available quantity, active status, and audit timestamps
-- `ProductRepository` using Spring Data JPA
-- Request and response DTOs for create, update, and read operations
-- `ProductService` business rules for SKU uniqueness, price validation, quantity validation, lookup, update, and deactivation
-- `ProductController` REST endpoints under `/products`
-- H2 console enabled for local database inspection at `/h2-console`
-- Unit tests for product service business rules
-- Spring Boot integration tests for the Product API in `ProductApiIntegrationTest`
-
-## Phase 2 - Order Workflow
-
-Implemented order creation with order items, product lookup, inventory validation, price/name/SKU snapshots, subtotal/tax/total calculation, and inventory deduction.
-
-This phase includes:
-
-- `Order` and `OrderItem` JPA entities
-- `OrderStatus` enum with lifecycle statuses
-- `OrderRepository` and `OrderItemRepository`
-- Request and response DTOs for order creation and lookup
-- `OrderService` business rules for product lookup, active product checks, inventory validation, snapshotting, totals, and inventory deduction
-- `OrderController` REST endpoints under `/orders`
-- Fixed `8.25%` tax calculation for portfolio/demo purposes
-- Unit tests for order service business rules
-- Spring Boot integration tests for the Order API in `OrderApiIntegrationTest`
-
-## Phase 3 - Shipment Workflow
-
-Implemented shipment creation and order status transition from `CREATED` to `SHIPPED`. Added validation to prevent duplicate shipments and invalid order state transitions.
-
-This phase includes:
-
-- `Shipment` JPA entity with order reference, carrier, tracking number, shipped time, and creation timestamp
-- `ShipmentRepository` using Spring Data JPA
-- Request and response DTOs for shipping an order
-- `OrderService` shipping business operation
-- `POST /orders/{id}/ship` endpoint
-- Validation for missing carrier, missing tracking number, nonexistent orders, already shipped orders, and cancelled orders
-- Unit tests for shipment business rules
-- Spring Boot integration tests for the Shipment API in `ShipmentApiIntegrationTest`
-
-## Phase 4 - Error Handling and Validation
-
-Added centralized exception handling, consistent error responses, validation messages, and proper HTTP status codes for API failures.
-
-This phase includes:
-
-- `ErrorResponse` DTO for predictable API error payloads
-- `GlobalExceptionHandler` for centralized exception mapping
-- Shared `ResourceNotFoundException` base for missing resources
-- Standard responses for validation errors, malformed JSON, missing resources, duplicate SKU, insufficient inventory, invalid order state, duplicate shipment, and unexpected server errors
-- Field-level validation details for request validation failures
-- Automated error response tests in `ApiErrorIntegrationTest` and `GlobalExceptionHandlerTest`
-
-## Phase 5 - Integration and Functional Testing
-
-Added unit, integration, and functional workflow tests covering product creation, order creation, inventory deduction, shipment creation, validation errors, and invalid state transitions.
-
-This phase includes:
-
-- Full product-to-order-to-shipment workflow coverage in `OrderWorkflowIntegrationTest`
-- End-to-end API tests using Spring Boot, MockMvc, services, repositories, validation, and H2 persistence together
-- Repository state assertions for inventory deduction, order creation, shipment creation, and failed workflow rollback behavior
-- Failure workflow tests proving invalid product payloads, insufficient inventory, and duplicate shipments return predictable errors without unwanted persistence changes
-- Documentation for running all tests or the focused workflow suite
-
-Manual workflow demo commands live in `docs/youtube/05-integration-functional-testing.md`.
-
-## Phase 6 - Destructive and Resilience Testing
-
-Added destructive tests that intentionally send invalid payloads, bad IDs, duplicate operations, insufficient inventory cases, and invalid order state transitions. These tests demonstrate how the API fails safely and predictably.
-
-This phase includes:
-
-- Destructive API coverage in `DestructiveApiIntegrationTest`
-- Malformed JSON, missing fields, invalid values, and invalid path ID tests
-- Duplicate SKU and duplicate shipment tests
-- Nonexistent product and order ID tests
-- Inactive product and insufficient inventory tests
-- Cancelled order shipment tests
-- State-safety assertions proving failed requests do not create unwanted products, orders, order items, shipments, or inventory deductions
-- Timeout and error troubleshooting notes
-
-Manual destructive demo commands live in `docs/youtube/06-destructive-testing.md`.
-
-## Phase 7 - Docker and PostgreSQL
-
-Added Docker support and a PostgreSQL-backed Docker Compose profile. The application can run locally with H2 or in containers with PostgreSQL.
-
-This phase includes:
-
-- `Dockerfile` for building and running the Spring Boot jar
-- `.dockerignore` for cleaner Docker build context
-- `docker-compose.yml` with `retail-order-service` and `postgres` services
-- `application-docker.yml` Spring profile for PostgreSQL
-- PostgreSQL JDBC driver as a runtime dependency
-- H2 preserved as the default local development database
-- Documentation for Docker build, Compose startup, health checks, and shutdown
-
-Manual Docker demo commands live in `docs/youtube/07-docker-postgresql.md`.
-
-## Phase 8 - CI/CD
-
-Added GitHub Actions workflow to run Maven tests and package the application on each push and pull request. This demonstrates source control discipline, automated testing, build verification, package verification, Java 21 setup, Maven dependency caching, and CI readiness.
-
-This phase includes:
-
-- `.github/workflows/ci.yml`
-- GitHub Actions triggers for push and pull request events
-- Java 21 setup using Temurin
-- Maven dependency caching
-- `mvn test` execution in CI
-- `mvn package` execution in CI
-- Packaged jar verification
-- CI status badge in the README
-
-## Phase 9 - Logging and Monitoring
-
-Added production-oriented logging and Spring Boot Actuator endpoints for health and service diagnostics. This demonstrates basic observability and production support readiness.
-
-This phase includes:
-
-- Structured key-value service logs for product creation, order creation, inventory deduction, shipment creation, and selected business failures
-- `INFO` logs for successful business events
-- `WARN` logs for duplicate SKU, inactive product, insufficient inventory, and invalid shipment state attempts
-- Actuator exposure for `/actuator/health` and `/actuator/info`
-- Liveness and readiness health probes
-- Application metadata under `/actuator/info`
-- Automated tests for diagnostic endpoints and representative log output
-
-Manual diagnostic demo commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
-
-## Phase 10 - Security
-
-Added basic Spring Security authentication and role-based authorization for write operations. This demonstrates exposure to authentication, authorization, and endpoint protection.
-
-This phase includes:
-
-- Spring Security dependency and configuration
-- HTTP Basic authentication
-- In-memory demo users with `USER` and `ADMIN` roles
-- Public health and diagnostic endpoints
-- Public read endpoints for product and order lookup
-- `ADMIN` protection for product create, update, deactivate, and shipment creation
-- `USER` or `ADMIN` protection for order creation
-- Automated security tests in `SecurityIntegrationTest`
-
-Demo users:
-
-| Username | Password | Roles |
-|---|---|---|
-| `user` | `user-password` | `USER` |
-| `admin` | `admin-password` | `USER`, `ADMIN` |
-
-These credentials are for local portfolio/demo use only. Manual security demo commands live in `docs/youtube/10-basic-security.md`.
-
-## Phase 11 - Performance Testing
-
-Added basic k6 performance tests for product listing and order workflow endpoints. Documented request volume, response times, and error rates to demonstrate exposure to performance testing.
-
-This phase includes:
-
-- `performance/k6/product-list.js` for repeated `GET /products` traffic
-- `performance/k6/order-workflow.js` for product create, order create, order read, and shipment workflow traffic
-- Baseline expectations for request volume, average response time, p95 response time, and error rate
-- Separation between Java automated tests and k6 performance smoke scripts
-
-Manual performance demo commands live in `docs/youtube/11-performance-testing.md`. Baseline expectations live in `performance/baseline-expectations.md`.
-
-## Package Structure
-
-```text
-com.example.retailorderservice
-|-- config
-|-- controller
-|-- dto
-|   |-- request
-|   `-- response
-|-- entity
-|-- exception
-|-- mapper
-|-- repository
-|-- security
-`-- service
-```
-
-## Endpoints
-
-### Custom Health
-
-```http
-GET /health
-```
-
-Example response:
-
-```json
-{
-  "status": "UP",
-  "service": "retail-order-service",
-  "timestamp": "2026-06-04T12:00:00Z"
-}
-```
-
-### Actuator Health
-
-```http
-GET /actuator/health
-```
-
-Example response:
-
-```json
-{
-  "status": "UP"
-}
-```
-
-Additional diagnostic endpoints:
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/actuator/health/liveness` | Check whether the app process is alive |
-| GET | `/actuator/health/readiness` | Check whether the app is ready to receive traffic |
-| GET | `/actuator/info` | Return service metadata |
-
-Manual diagnostic demo commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
-
-### Products
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/products` | List products |
-| GET | `/products/{id}` | Get product by ID |
-| POST | `/products` | Create product |
-| PUT | `/products/{id}` | Update product |
-| DELETE | `/products/{id}` | Deactivate product |
-
-`GET /products` supports optional query parameters:
-
-| Parameter | Example | Purpose |
-|---|---|---|
-| `active` | `true` | Filter by active status |
-| `sku` | `HAMMER-001` | Filter by SKU |
-| `page` | `0` | Select result page |
-| `size` | `20` | Select page size |
-
-Detailed manual demo commands live in `docs/youtube/01-product-api.md`. Reusable API request examples live in `docs/api-examples.md`.
-
-### Orders
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/orders` | List orders |
-| GET | `/orders/{id}` | Get order by ID |
-| POST | `/orders` | Create order |
-| POST | `/orders/{id}/ship` | Ship an order |
-
-`GET /orders` supports optional query parameters:
-
-| Parameter | Example | Purpose |
-|---|---|---|
-| `status` | `CREATED` | Filter by order status |
-| `customerEmail` | `customer@example.com` | Filter by customer email |
-| `page` | `0` | Select result page |
-| `size` | `20` | Select page size |
-
-Order totals are calculated server-side. Phase 2 uses a simplified fixed `8.25%` tax rate for portfolio purposes.
-
-Shipping is a business operation. It creates a shipment record and changes the order status from `CREATED` to `SHIPPED`.
-
-Detailed manual demo commands live in `docs/youtube/02-order-workflow.md` and `docs/youtube/03-shipment-workflow.md`. Reusable API request examples live in `docs/api-examples.md`.
-
-### Security Summary
-
-| Endpoint | Access |
+| Layer | Responsibility |
 |---|---|
-| `GET /health` | Public |
-| `GET /actuator/health` | Public |
-| `GET /actuator/info` | Public |
-| `GET /products/**` | Public |
-| `GET /orders/**` | Public |
-| `POST /products` | `ADMIN` |
-| `PUT /products/{id}` | `ADMIN` |
-| `DELETE /products/{id}` | `ADMIN` |
-| `POST /orders` | `USER` or `ADMIN` |
-| `POST /orders/{id}/ship` | `ADMIN` |
+| `controller` | REST endpoints and HTTP response handling |
+| `dto.request` | Validated inbound request payloads |
+| `dto.response` | API response payloads separated from persistence entities |
+| `service` | Product, order, inventory, shipment, and business workflow rules |
+| `repository` | Spring Data JPA database access |
+| `entity` | JPA persistence model |
+| `mapper` | Entity-to-response conversion |
+| `exception` | Centralized API error handling |
+| `security` | HTTP Basic authentication and role-based authorization |
 
-Manual security demo commands live in `docs/youtube/10-basic-security.md`.
+Architecture details live in `docs/architecture.md`.
 
-### Error Responses
+## Business Workflow
 
-API failures use a consistent response shape:
+The core workflow is:
 
-```json
-{
-  "timestamp": "2026-06-04T12:00:00Z",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Quantity must be greater than zero",
-  "path": "/orders"
-}
-```
+1. Create an active product with a unique SKU and available inventory.
+2. Create an order for one or more products.
+3. Validate that each product exists, is active, and has enough inventory.
+4. Snapshot product SKU, name, and unit price into order items.
+5. Calculate subtotal, fixed demo tax, and total server-side.
+6. Deduct inventory in the same transaction as order creation.
+7. Ship the order as a business operation.
+8. Create one shipment record and transition the order from `CREATED` to `SHIPPED`.
 
-Validation failures may also include `validationErrors` with field-specific messages.
+Duplicate SKUs, inactive products, insufficient inventory, duplicate shipments, invalid order states, malformed JSON, and validation failures return predictable API errors.
 
-Detailed manual demo commands live in `docs/youtube/04-error-handling-validation.md`. Reusable examples live in `docs/api-examples.md`.
+## Database Model
 
-## How to Run
+| Table | Purpose | Key Fields |
+|---|---|---|
+| `products` | Product catalog and inventory | `sku`, `name`, `price`, `quantity_available`, `active`, audit timestamps |
+| `orders` | Customer order header | `order_number`, `customer_email`, `status`, `subtotal`, `tax`, `total`, audit timestamps |
+| `order_items` | Snapshotted line items | `order_id`, `product_id`, `sku_snapshot`, `product_name_snapshot`, `unit_price_snapshot`, `quantity`, `line_total` |
+| `shipments` | Shipment record for an order | `order_id`, `carrier`, `tracking_number`, `shipped_at`, `created_at` |
 
-Local H2 mode:
+Local development uses an in-memory H2 database by default. Docker Compose runs the same application against PostgreSQL.
+
+## API Endpoints
+
+| Method | Endpoint | Access | Purpose |
+|---|---|---|---|
+| `GET` | `/health` | Public | Custom service health |
+| `GET` | `/actuator/health` | Public | Actuator health |
+| `GET` | `/actuator/health/liveness` | Public | Liveness probe |
+| `GET` | `/actuator/health/readiness` | Public | Readiness probe |
+| `GET` | `/actuator/info` | Public | Service metadata |
+| `GET` | `/products` | Public | List products with optional filters |
+| `GET` | `/products/{id}` | Public | Get one product |
+| `POST` | `/products` | `ADMIN` | Create product |
+| `PUT` | `/products/{id}` | `ADMIN` | Update product |
+| `DELETE` | `/products/{id}` | `ADMIN` | Deactivate product |
+| `GET` | `/orders` | Public | List orders with optional filters |
+| `GET` | `/orders/{id}` | Public | Get one order |
+| `POST` | `/orders` | `USER` or `ADMIN` | Create order |
+| `POST` | `/orders/{id}/ship` | `ADMIN` | Ship order |
+
+Reusable request examples live in `docs/api-examples.md`. Step-by-step demo commands live in the matching files under `docs/youtube/`.
+
+## How to Run Locally
+
+Start the application with H2:
 
 ```bash
 mvn spring-boot:run
 ```
 
-The application starts on `http://localhost:8080`.
+The application runs at `http://localhost:8080`.
 
-Local H2 console:
+The local H2 console is available at:
 
 ```text
 http://localhost:8080/h2-console
 ```
 
-Use JDBC URL `jdbc:h2:mem:retail_order_service`, user `sa`, and a blank password.
+Use:
+
+```text
+JDBC URL: jdbc:h2:mem:retail_order_service
+User: sa
+Password:
+```
+
+The password is blank, and H2 data resets when the app restarts.
 
 ## How to Run with Docker
 
-Build the image:
-
-```bash
-docker build -t retail-order-service .
-```
-
-Start the app with PostgreSQL:
+Build and run the application with PostgreSQL:
 
 ```bash
 docker compose up --build
-```
-
-Verify:
-
-```bash
-curl http://localhost:8080/actuator/health
-curl http://localhost:8080/products
 ```
 
 Stop the containers:
@@ -394,54 +137,145 @@ Stop the containers:
 docker compose down
 ```
 
-Docker Compose runs the app with the `docker` Spring profile and PostgreSQL. Local `mvn spring-boot:run` still uses H2 by default.
+Docker Compose starts PostgreSQL plus the Spring Boot app with `SPRING_PROFILES_ACTIVE=docker`. H2 remains the default for local `mvn spring-boot:run`.
 
-## How to Test
+## How to Run Tests
+
+Run the full Java test suite:
 
 ```bash
 mvn test
 ```
 
-Run only the Phase 5 workflow tests:
+Run focused suites:
 
 ```bash
 mvn test -Dtest=OrderWorkflowIntegrationTest
-```
-
-Run only the Phase 6 destructive tests:
-
-```bash
 mvn test -Dtest=DestructiveApiIntegrationTest
-```
-
-Run only the diagnostic endpoint tests:
-
-```bash
+mvn test -Dtest=SecurityIntegrationTest
 mvn test -Dtest=HealthControllerTest
 ```
 
-Run only the Phase 10 security tests:
-
-```bash
-mvn test -Dtest=SecurityIntegrationTest
-```
-
-k6 performance scripts live under `performance/k6`. They are separate from Maven tests and are documented in `docs/youtube/11-performance-testing.md`.
-
-Package the application locally:
+Package the application:
 
 ```bash
 mvn package
 ```
 
-GitHub Actions also runs tests and packaging automatically on push and pull request.
+The Java suite is the source of truth for application behavior. k6 scripts are separate performance smoke scripts and do not replace Maven tests.
+
+Testing details live in `docs/testing-guide.md`.
+
+## Functional Workflow Demo
+
+The final demo walkthrough shows:
+
+1. Start the application.
+2. Show health endpoint.
+3. Create a product.
+4. List products.
+5. Create an order.
+6. Show inventory deduction.
+7. Ship the order.
+8. Show order status changed to `SHIPPED`.
+9. Trigger a duplicate shipment error.
+10. Run tests.
+11. Show GitHub Actions passing.
+12. Show Docker Compose running.
+
+The full command-by-command final demo script lives in `docs/youtube/12-final-demo-portfolio-polish.md`.
+
+## Destructive Testing
+
+Destructive and resilience tests intentionally verify bad input and bad state:
+
+- Malformed JSON
+- Missing fields
+- Invalid values
+- Duplicate SKU
+- Inactive product order attempts
+- Insufficient inventory
+- Nonexistent product and order IDs
+- Duplicate shipment attempts
+- Cancelled order shipment attempts
+
+These tests assert both the API response and the persisted state after failure.
+
+## Performance Testing
+
+k6 scripts live under `performance/k6`:
+
+- `product-list.js` exercises repeated `GET /products` traffic.
+- `order-workflow.js` exercises product creation, order creation, order lookup, and shipment.
+
+Baseline expectations live in `performance/baseline-expectations.md`. Manual performance commands live in `docs/youtube/11-performance-testing.md`.
+
+## Security
+
+The project uses HTTP Basic authentication with simple in-memory demo users.
+
+| Username | Password | Roles |
+|---|---|---|
+| `user` | `user-password` | `USER` |
+| `admin` | `admin-password` | `USER`, `ADMIN` |
+
+Public endpoints include health, diagnostics, product reads, and order reads. Product writes and shipment creation require `ADMIN`; order creation requires `USER` or `ADMIN`.
+
+These credentials are for local portfolio/demo use only. The project intentionally does not implement JWT, OAuth, database-backed users, or a frontend login.
+
+## Logging And Monitoring
+
+Spring Boot Actuator exposes health, liveness, readiness, and service info endpoints. Services emit structured key-value logs for important business events and selected failure cases, including product creation, order creation, inventory deduction, shipment creation, insufficient inventory, and invalid shipment attempts.
+
+Diagnostics details live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
+
+## CI/CD
+
+GitHub Actions runs on push and pull request:
+
+- Checks out the repository.
+- Sets up Temurin Java 21.
+- Caches Maven dependencies.
+- Runs `mvn test`.
+- Runs `mvn package`.
+- Verifies the Spring Boot jar exists.
+
+The workflow verifies build readiness but does not deploy infrastructure.
+
+## Troubleshooting
+
+Common local issues and fixes are documented in `docs/troubleshooting.md`, including Java and Maven setup, H2 console access, API validation failures, Docker Compose startup, GitHub Actions failures, security responses, and k6 availability.
+
+## What I Learned
+
+- How to grow a backend service one commit-ready phase at a time.
+- How to separate REST controllers, DTOs, business services, repositories, entities, and exception handling.
+- How to model realistic retail workflow rules such as inventory validation, product snapshots, and shipment state transitions.
+- How to test the service at multiple levels: unit, controller integration, functional workflow, destructive resilience, diagnostics, and security.
+- How to keep local development simple with H2 while supporting a PostgreSQL Docker profile.
+- How to add CI, logging, health checks, security boundaries, and performance smoke tests without changing the core business API.
+
+## Future Improvements
+
+- Replace in-memory demo users with production identity such as OAuth2/OIDC or JWT validation.
+- Add Flyway or Liquibase database migrations.
+- Add Testcontainers for PostgreSQL-backed integration tests.
+- Add OpenAPI documentation.
+- Add metrics dashboards and alerting.
+- Add idempotency keys for order and shipment operations.
+- Add optimistic locking or inventory reservation logic for higher concurrency.
+- Add a real deployment target such as Azure, AWS, GCP, or Kubernetes.
+- Expand k6 scenarios after collecting real baseline numbers in a controlled environment.
+
+## Documentation Map
+
+- `docs/architecture.md` explains the system design.
+- `docs/testing-guide.md` explains automated test coverage.
+- `docs/api-examples.md` keeps reusable API request examples.
+- `docs/troubleshooting.md` collects common debugging notes.
+- `docs/portfolio-summary.md` provides resume, LinkedIn, and interview wording.
+- `docs/youtube/` contains phase-by-phase tutorial and demo scripts.
 
 ## Phase Completion Rule
 
 No phase is complete until the app runs, tests pass, documentation is updated, and the phase is ready for a Git commit.
-
-Definition of Done:
-
-- `mvn test` passes.
-- Automated tests cover the phase behavior.
-- Manual curl demo commands are documented in the matching YouTube tutorial file.

@@ -35,7 +35,7 @@ info:
     name: retail-order-service
     description: Retail order workflow API
     version: 0.0.1-SNAPSHOT
-    phase: "9"
+    phase: "12"
     diagnostics: health,info
 
 logging:

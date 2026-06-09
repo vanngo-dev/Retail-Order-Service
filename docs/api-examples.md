@@ -2,6 +2,11 @@
 
 These are reusable API request examples. Step-by-step manual demo flows belong in the matching YouTube tutorial file under `docs/youtube/`.
 
+Write operations use the Phase 10 demo credentials:
+
+- `admin` / `admin-password` for product writes and shipment creation.
+- `user` / `user-password` for order creation.
+
 ## Health
 
 Custom service health:
@@ -39,7 +44,7 @@ Expected response:
 Create a product:
 
 ```bash
-curl -X POST http://localhost:8080/products \
+curl -u admin:admin-password -X POST http://localhost:8080/products \
   -H "Content-Type: application/json" \
   -d '{
     "sku": "HAMMER-001",
@@ -94,7 +99,7 @@ curl http://localhost:8080/products/1
 Update a product:
 
 ```bash
-curl -X PUT http://localhost:8080/products/1 \
+curl -u admin:admin-password -X PUT http://localhost:8080/products/1 \
   -H "Content-Type: application/json" \
   -d '{
     "sku": "HAMMER-001",
@@ -109,7 +114,7 @@ curl -X PUT http://localhost:8080/products/1 \
 Deactivate a product:
 
 ```bash
-curl -X DELETE http://localhost:8080/products/1
+curl -u admin:admin-password -X DELETE http://localhost:8080/products/1
 ```
 
 ## Orders
@@ -117,7 +122,7 @@ curl -X DELETE http://localhost:8080/products/1
 Create an order:
 
 ```bash
-curl -X POST http://localhost:8080/orders \
+curl -u user:user-password -X POST http://localhost:8080/orders \
   -H "Content-Type: application/json" \
   -d '{
     "customerEmail": "customer@example.com",
@@ -178,7 +183,7 @@ curl http://localhost:8080/orders/1
 Ship an order:
 
 ```bash
-curl -X POST http://localhost:8080/orders/1/ship \
+curl -u admin:admin-password -X POST http://localhost:8080/orders/1/ship \
   -H "Content-Type: application/json" \
   -d '{
     "carrier": "UPS",
@@ -231,7 +236,7 @@ Validation error shape:
 Duplicate SKU example:
 
 ```bash
-curl -X POST http://localhost:8080/products \
+curl -u admin:admin-password -X POST http://localhost:8080/products \
   -H "Content-Type: application/json" \
   -d '{
     "sku": "HAMMER-001",
@@ -246,7 +251,7 @@ curl -X POST http://localhost:8080/products \
 Malformed JSON example:
 
 ```bash
-curl -X POST http://localhost:8080/products \
+curl -u admin:admin-password -X POST http://localhost:8080/products \
   -H "Content-Type: application/json" \
   -d '{"sku":'
 ```

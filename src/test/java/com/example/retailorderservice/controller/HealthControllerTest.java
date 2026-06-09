@@ -55,7 +55,7 @@ class HealthControllerTest {
                 .andExpect(jsonPath("$.app.name").value("retail-order-service"))
                 .andExpect(jsonPath("$.app.description").value("Retail order workflow API"))
                 .andExpect(jsonPath("$.app.version").value("0.0.1-SNAPSHOT"))
-                .andExpect(jsonPath("$.app.phase").value("9"))
+                .andExpect(jsonPath("$.app.phase").value("12"))
                 .andExpect(jsonPath("$.app.diagnostics").value("health,info"));
     }
 }

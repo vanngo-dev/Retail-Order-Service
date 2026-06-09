@@ -311,3 +311,22 @@ Current performance testing coverage includes:
 - Baseline expectations for request volume, average response time, p95 response time, and error rate.
 
 Manual performance commands live in `docs/youtube/11-performance-testing.md`. k6 scripts do not replace the automated Java test suite.
+
+## Phase 12
+
+Run the full Java test suite:
+
+```bash
+mvn test
+```
+
+Phase 12 is documentation and portfolio polish. It does not add new business behavior, but the final phase is not complete until the existing automated suite still passes.
+
+Final verification includes:
+
+- README is organized for GitHub portfolio review.
+- Architecture, API examples, testing, troubleshooting, and portfolio summary docs are current.
+- The final demo script lives in `docs/youtube/12-final-demo-portfolio-polish.md`.
+- Protected write examples use the Phase 10 demo credentials.
+- Manual demo commands remain documentation aids, not the main verification method.
+- `mvn test` passes after the documentation cleanup.

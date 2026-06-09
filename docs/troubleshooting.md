@@ -321,3 +321,26 @@ Try:
 - Warm up the app with a few requests before recording results.
 - Compare average response time, p95 response time, request count, and error rate instead of relying on one request.
 - Treat local results as smoke-test baselines, not production service-level objectives.
+
+## Final Demo IDs Do Not Match The Script
+
+The final demo script assumes a fresh local H2 run, where the first product is usually ID `1` and the first order is usually ID `1`.
+
+If IDs differ:
+
+- Restart the app in local H2 mode to reset the in-memory database.
+- Read the `Location` header from create responses and use that ID in later commands.
+- In Docker Compose mode, remember PostgreSQL data persists in the Docker volume until you intentionally remove it.
+
+Manual final demo commands live in `docs/youtube/12-final-demo-portfolio-polish.md`.
+
+## Final Demo Write Request Returns 401 Or 403
+
+The finished project protects write operations.
+
+Use:
+
+- `admin` / `admin-password` for product create, product update, product deactivate, and shipment creation.
+- `user` / `user-password` for order creation.
+
+Read endpoints, health endpoints, and diagnostic endpoints remain public for the demo.
