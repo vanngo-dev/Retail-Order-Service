@@ -1,5 +1,7 @@
 # Retail Order Service
 
+[![CI](https://github.com/vanngo-dev/Retail-Order-Service/actions/workflows/ci.yml/badge.svg)](https://github.com/vanngo-dev/Retail-Order-Service/actions/workflows/ci.yml)
+
 Retail Order Service is a production-style Java/Spring Boot backend API that models a simplified retail order workflow. The project is built phase by phase to demonstrate backend engineering skills in REST API development, SQL persistence, validation, testing, source control, and production readiness.
 
 ## Tech Stack
@@ -15,6 +17,7 @@ Retail Order Service is a production-style Java/Spring Boot backend API that mod
 - Spring Boot Actuator
 - JUnit 5 and Spring Boot Test
 - Docker and Docker Compose
+- GitHub Actions
 
 ## Phase 0 - Project Setup
 
@@ -135,6 +138,21 @@ This phase includes:
 - Documentation for Docker build, Compose startup, health checks, and shutdown
 
 Manual Docker demo commands live in `docs/youtube/07-docker-postgresql.md`.
+
+## Phase 8 - CI/CD
+
+Added GitHub Actions workflow to run Maven tests and package the application on each push and pull request. This demonstrates source control discipline, automated testing, build verification, package verification, Java 21 setup, Maven dependency caching, and CI readiness.
+
+This phase includes:
+
+- `.github/workflows/ci.yml`
+- GitHub Actions triggers for push and pull request events
+- Java 21 setup using Temurin
+- Maven dependency caching
+- `mvn test` execution in CI
+- `mvn package` execution in CI
+- Packaged jar verification
+- CI status badge in the README
 
 ## Package Structure
 
@@ -312,6 +330,14 @@ Run only the Phase 6 destructive tests:
 ```bash
 mvn test -Dtest=DestructiveApiIntegrationTest
 ```
+
+Package the application locally:
+
+```bash
+mvn package
+```
+
+GitHub Actions also runs tests and packaging automatically on push and pull request.
 
 ## Phase Completion Rule
 

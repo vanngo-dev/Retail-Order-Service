@@ -210,3 +210,28 @@ Current Docker and PostgreSQL profile checks verify:
 - The `docker` Spring profile points to PostgreSQL and disables the H2 console.
 
 Manual Docker commands are demo and environment verification steps in `docs/youtube/07-docker-postgresql.md`. Automated tests remain the main verification for application behavior.
+
+## Phase 8
+
+Run the full test suite locally:
+
+```bash
+mvn test
+```
+
+Package the application locally:
+
+```bash
+mvn package
+```
+
+Current CI/CD checks verify:
+
+- GitHub Actions runs on push and pull request events.
+- CI uses Java 21.
+- CI caches Maven dependencies.
+- CI runs `mvn test`.
+- CI runs `mvn package`.
+- CI verifies the packaged Spring Boot jar exists.
+
+Manual CI walkthrough notes live in `docs/youtube/08-github-actions-ci.md`. The automated GitHub Actions workflow is the main verification for pull request and push checks.

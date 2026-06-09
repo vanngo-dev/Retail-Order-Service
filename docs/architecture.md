@@ -93,4 +93,15 @@ Phase 7 adds a second runtime mode without changing local defaults:
 - The `retail-order-service` container starts with `SPRING_PROFILES_ACTIVE=docker`.
 - The `postgres` service provides the database for containerized runs.
 - H2 console remains available in local mode and is disabled in the Docker profile.
-- Docker support is runtime packaging only; CI/CD remains planned for a later phase.
+- Docker support is runtime packaging only; deployment automation remains planned for a later phase.
+
+## Phase 8 GitHub Actions CI/CD
+
+Phase 8 adds automated repository checks:
+
+- `.github/workflows/ci.yml` runs on push and pull request events.
+- The workflow checks out the repository and sets up Temurin Java 21.
+- Maven dependency caching speeds up repeated workflow runs.
+- CI runs `mvn test` to prove the automated test suite.
+- CI runs `mvn package` and verifies the Spring Boot jar exists.
+- The workflow stops at build, test, and package verification; it does not deploy the application.

@@ -1,5 +1,15 @@
 # Changelog
 
+## Phase 8 - GitHub Actions CI/CD
+
+- Added GitHub Actions CI workflow at `.github/workflows/ci.yml`.
+- Configured CI to run on push and pull request events.
+- Configured Java 21 setup with Maven dependency caching.
+- Added CI steps for `mvn test` and `mvn package`.
+- Added packaged jar verification.
+- Added CI badge to README.
+- Updated README and project documentation.
+
 ## Phase 7 - Docker and PostgreSQL
 
 - Added `Dockerfile`.

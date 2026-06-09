@@ -193,3 +193,39 @@ docker compose down -v
 ```
 
 Only use `-v` when you are comfortable deleting the local PostgreSQL volume.
+
+## GitHub Actions CI Fails
+
+Open the failed workflow run in GitHub Actions and check the first failed step.
+
+Common causes:
+
+- Java setup failed: confirm the workflow uses Java 21.
+- Dependency download failed: rerun the workflow after network or Maven repository availability returns.
+- Test step failed: run `mvn test` locally and fix the failing test or application behavior.
+- Package step failed: run `mvn package` locally and confirm the Spring Boot jar is created under `target/`.
+- CI badge does not show: confirm the repository path and workflow filename are correct.
+
+The Phase 8 workflow only builds, tests, and packages the application. It does not deploy containers or run production infrastructure.
+
+## Maven Package Fails Locally
+
+If `mvn package` fails while writing under your local Maven cache, or reports missing classes from a Maven plugin, refresh the local dependency cache:
+
+```bash
+mvn package
+```
+
+If the user-level `.m2` directory is not writable, use a temporary Maven repository inside the project:
+
+```bash
+mvn -B -ntp "-Dmaven.repo.local=target/maven-repository" package
+```
+
+Common local causes:
+
+- The terminal cannot write to `C:\Users\<you>\.m2\repository`.
+- A plugin artifact is present but its POM or transitive dependencies are missing.
+- Offline mode is enabled before the required package plugins are fully cached.
+
+Fix the local Maven cache permissions or rerun with network access so Maven can download the missing plugin metadata. GitHub Actions uses a fresh hosted runner and Maven cache, so it can download these build plugins during CI.
