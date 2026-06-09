@@ -1,10 +1,6 @@
 package com.example.retailorderservice.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class OrderNotFoundException extends RuntimeException {
+public class OrderNotFoundException extends ResourceNotFoundException {
 
     public OrderNotFoundException(Long id) {
         super("Order not found with id: " + id);

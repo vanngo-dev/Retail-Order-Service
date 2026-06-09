@@ -108,3 +108,25 @@ Current shipment coverage verifies:
 - Unknown order IDs return `404`.
 
 Manual curl examples are demo scripts in `docs/youtube/03-shipment-workflow.md`. The important endpoint behavior is automated in `ShipmentApiIntegrationTest`.
+
+## Phase 4
+
+Run the test suite:
+
+```bash
+mvn test
+```
+
+Current API quality coverage verifies:
+
+- Duplicate SKU failures return the standard `409 Conflict` error response.
+- Missing product name failures return the standard `400 Bad Request` validation response.
+- Zero price failures return the standard `400 Bad Request` validation response.
+- Unknown order IDs return the standard `404 Not Found` error response.
+- Insufficient inventory failures return the standard `409 Conflict` error response.
+- Duplicate shipment requests return the standard `409 Conflict` error response.
+- Malformed JSON returns the standard `400 Bad Request` error response.
+- Unexpected server errors are mapped to the standard `500 Internal Server Error` response shape.
+- Validation failures include field-level `validationErrors` details.
+
+Manual curl examples are demo scripts in `docs/youtube/04-error-handling-validation.md`. The important endpoint behavior is automated in `ApiErrorIntegrationTest` and `GlobalExceptionHandlerTest`.

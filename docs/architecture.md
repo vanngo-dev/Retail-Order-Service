@@ -56,4 +56,12 @@ Phase 3 adds shipping as an order business operation:
 - Already shipped orders and cancelled orders are rejected.
 - The shipment endpoint is exposed at `POST /orders/{id}/ship`.
 
-Centralized API error response polish remains planned for Phase 4.
+## Phase 4 Error Handling and Validation
+
+Phase 4 centralizes API failure handling:
+
+- `ErrorResponse` defines the standard error payload with timestamp, status, error, message, path, and optional validation details.
+- `GlobalExceptionHandler` maps validation failures, malformed JSON, missing resources, duplicate SKU, inventory conflicts, invalid order states, duplicate shipments, and unexpected exceptions.
+- `ResourceNotFoundException` is the shared base type for missing API resources.
+- Domain exceptions stay focused on business meaning while HTTP status mapping lives in one handler.
+- Bean Validation messages are returned to clients with field-level `validationErrors` where applicable.

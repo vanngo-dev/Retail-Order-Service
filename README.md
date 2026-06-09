@@ -74,6 +74,19 @@ This phase includes:
 - Unit tests for shipment business rules
 - Spring Boot integration tests for the Shipment API in `ShipmentApiIntegrationTest`
 
+## Phase 4 - Error Handling and Validation
+
+Added centralized exception handling, consistent error responses, validation messages, and proper HTTP status codes for API failures.
+
+This phase includes:
+
+- `ErrorResponse` DTO for predictable API error payloads
+- `GlobalExceptionHandler` for centralized exception mapping
+- Shared `ResourceNotFoundException` base for missing resources
+- Standard responses for validation errors, malformed JSON, missing resources, duplicate SKU, insufficient inventory, invalid order state, duplicate shipment, and unexpected server errors
+- Field-level validation details for request validation failures
+- Automated error response tests in `ApiErrorIntegrationTest` and `GlobalExceptionHandlerTest`
+
 ## Package Structure
 
 ```text
@@ -167,6 +180,24 @@ Order totals are calculated server-side. Phase 2 uses a simplified fixed `8.25%`
 Shipping is a business operation. It creates a shipment record and changes the order status from `CREATED` to `SHIPPED`.
 
 Detailed manual demo commands live in `docs/youtube/02-order-workflow.md` and `docs/youtube/03-shipment-workflow.md`. Reusable API request examples live in `docs/api-examples.md`.
+
+### Error Responses
+
+API failures use a consistent response shape:
+
+```json
+{
+  "timestamp": "2026-06-04T12:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Quantity must be greater than zero",
+  "path": "/orders"
+}
+```
+
+Validation failures may also include `validationErrors` with field-specific messages.
+
+Detailed manual demo commands live in `docs/youtube/04-error-handling-validation.md`. Reusable examples live in `docs/api-examples.md`.
 
 ## How to Run
 

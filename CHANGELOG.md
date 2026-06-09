@@ -1,5 +1,16 @@
 # Changelog
 
+## Phase 4 - Error Handling and Validation
+
+- Added `ErrorResponse` DTO for standard API error payloads.
+- Added centralized `GlobalExceptionHandler`.
+- Added shared `ResourceNotFoundException` base for missing resources.
+- Standardized validation, malformed JSON, not found, conflict, and unexpected server error responses.
+- Added field-level validation error details.
+- Added API integration tests for important error response behavior.
+- Added handler unit coverage for unexpected server errors.
+- Updated README and project documentation.
+
 ## Phase 3 - Shipment Workflow
 
 - Added `Shipment` JPA entity.

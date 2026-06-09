@@ -1,5 +1,21 @@
 # Troubleshooting
 
+## API Error Response Shape
+
+API failures return a consistent JSON response:
+
+```json
+{
+  "timestamp": "2026-06-04T12:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Name is required",
+  "path": "/products"
+}
+```
+
+Validation failures may also include `validationErrors` with field-specific messages.
+
 ## Java or Maven Is Not Available
 
 If `java -version` or `mvn -version` fails, install Java 21 and Maven, then reopen the terminal so PATH is refreshed.
@@ -107,3 +123,15 @@ The order exists, but it cannot be shipped in its current state. Common causes:
 - The order has already been shipped.
 - The order is cancelled.
 - The order is not in `CREATED` status.
+
+## Request Returns Malformed JSON
+
+Check that the request body is valid JSON:
+
+- Property names and string values must use double quotes.
+- Objects and arrays must have matching braces and brackets.
+- The `Content-Type` header should be `application/json`.
+
+## Request Returns 500 Internal Server Error
+
+The API hides unexpected server details behind a generic message. Check the application logs for the stack trace, fix the underlying issue, and add a regression test if the failure represents a missing business or validation rule.

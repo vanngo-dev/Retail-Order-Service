@@ -198,3 +198,55 @@ Expected response shape:
   "createdAt": "2026-06-04T12:00:00Z"
 }
 ```
+
+## Error Responses
+
+Standard error shape:
+
+```json
+{
+  "timestamp": "2026-06-04T12:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Name is required",
+  "path": "/products"
+}
+```
+
+Validation error shape:
+
+```json
+{
+  "timestamp": "2026-06-04T12:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Name is required",
+  "path": "/products",
+  "validationErrors": {
+    "name": "Name is required"
+  }
+}
+```
+
+Duplicate SKU example:
+
+```bash
+curl -X POST http://localhost:8080/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sku": "HAMMER-001",
+    "name": "Duplicate Hammer",
+    "description": "Duplicate SKU example",
+    "price": 21.99,
+    "quantityAvailable": 5,
+    "active": true
+  }'
+```
+
+Malformed JSON example:
+
+```bash
+curl -X POST http://localhost:8080/products \
+  -H "Content-Type: application/json" \
+  -d '{"sku":'
+```
