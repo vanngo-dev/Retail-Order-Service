@@ -263,3 +263,30 @@ Current logging and diagnostics coverage verifies:
 - Invalid shipment state emits a warning log.
 
 Manual diagnostic curl commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`. Automated tests remain the main verification for phase behavior.
+
+## Phase 10
+
+Run the full test suite:
+
+```bash
+mvn test
+```
+
+Run only the security tests:
+
+```bash
+mvn test -Dtest=SecurityIntegrationTest
+```
+
+Current security coverage verifies:
+
+- Public health endpoints do not require authentication.
+- Anonymous users cannot create products.
+- `USER` cannot create products.
+- `ADMIN` can create products.
+- `USER` can create orders.
+- `USER` cannot ship orders.
+- `ADMIN` can ship orders.
+- Existing business and workflow tests authenticate with the correct role so business behavior remains covered.
+
+Manual security curl commands live in `docs/youtube/10-basic-security.md`. Automated tests remain the main verification for security behavior.

@@ -1,5 +1,17 @@
 # Changelog
 
+## Phase 10 - Basic Security Exposure
+
+- Added Spring Security dependency.
+- Added HTTP Basic security configuration.
+- Added in-memory demo users for `USER` and `ADMIN` roles.
+- Protected product write endpoints with `ADMIN`.
+- Protected order creation with `USER` or `ADMIN`.
+- Protected shipment creation with `ADMIN`.
+- Kept health and diagnostic endpoints public.
+- Added automated security integration tests.
+- Updated README and project documentation.
+
 ## Phase 9 - Logging, Monitoring, Health Checks, and Diagnostics
 
 - Added structured key-value service logs for product creation, order creation, inventory deduction, shipment creation, and selected business failures.

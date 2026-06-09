@@ -14,6 +14,7 @@ Retail Order Service is a production-style Java/Spring Boot backend API that mod
 - H2 Database
 - PostgreSQL
 - Spring Validation
+- Spring Security
 - Spring Boot Actuator
 - SLF4J and Logback logging
 - JUnit 5 and Spring Boot Test
@@ -171,6 +172,30 @@ This phase includes:
 
 Manual diagnostic demo commands live in `docs/youtube/09-logging-monitoring-diagnostics.md`.
 
+## Phase 10 - Security
+
+Added basic Spring Security authentication and role-based authorization for write operations. This demonstrates exposure to authentication, authorization, and endpoint protection.
+
+This phase includes:
+
+- Spring Security dependency and configuration
+- HTTP Basic authentication
+- In-memory demo users with `USER` and `ADMIN` roles
+- Public health and diagnostic endpoints
+- Public read endpoints for product and order lookup
+- `ADMIN` protection for product create, update, deactivate, and shipment creation
+- `USER` or `ADMIN` protection for order creation
+- Automated security tests in `SecurityIntegrationTest`
+
+Demo users:
+
+| Username | Password | Roles |
+|---|---|---|
+| `user` | `user-password` | `USER` |
+| `admin` | `admin-password` | `USER`, `ADMIN` |
+
+These credentials are for local portfolio/demo use only. Manual security demo commands live in `docs/youtube/10-basic-security.md`.
+
 ## Package Structure
 
 ```text
@@ -275,6 +300,23 @@ Shipping is a business operation. It creates a shipment record and changes the o
 
 Detailed manual demo commands live in `docs/youtube/02-order-workflow.md` and `docs/youtube/03-shipment-workflow.md`. Reusable API request examples live in `docs/api-examples.md`.
 
+### Security Summary
+
+| Endpoint | Access |
+|---|---|
+| `GET /health` | Public |
+| `GET /actuator/health` | Public |
+| `GET /actuator/info` | Public |
+| `GET /products/**` | Public |
+| `GET /orders/**` | Public |
+| `POST /products` | `ADMIN` |
+| `PUT /products/{id}` | `ADMIN` |
+| `DELETE /products/{id}` | `ADMIN` |
+| `POST /orders` | `USER` or `ADMIN` |
+| `POST /orders/{id}/ship` | `ADMIN` |
+
+Manual security demo commands live in `docs/youtube/10-basic-security.md`.
+
 ### Error Responses
 
 API failures use a consistent response shape:
@@ -362,6 +404,12 @@ Run only the diagnostic endpoint tests:
 
 ```bash
 mvn test -Dtest=HealthControllerTest
+```
+
+Run only the Phase 10 security tests:
+
+```bash
+mvn test -Dtest=SecurityIntegrationTest
 ```
 
 Package the application locally:

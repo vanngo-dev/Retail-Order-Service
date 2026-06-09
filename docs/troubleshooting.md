@@ -251,3 +251,36 @@ Expected Phase 9 service logs include:
 - `Invalid order state attempted`
 
 Avoid adding customer email, full payloads, passwords, or shipment tracking numbers to routine logs.
+
+## Request Returns 401 Unauthorized
+
+The endpoint requires authentication and no valid credentials were provided. Phase 10 uses HTTP Basic with local demo users.
+
+Demo credentials:
+
+- `user` / `user-password`
+- `admin` / `admin-password`
+
+Manual security curl commands live in `docs/youtube/10-basic-security.md`.
+
+## Request Returns 403 Forbidden
+
+The credentials are valid, but the authenticated user does not have the required role.
+
+Common examples:
+
+- `USER` cannot create, update, or deactivate products.
+- `USER` cannot ship orders.
+- `ADMIN` can perform protected product and shipment operations.
+
+This phase does not add JWT, OAuth, database-backed users, or frontend login.
+
+## H2 Console Is Blocked or Blank
+
+Phase 10 allows `/h2-console/**` for local development and sets same-origin frame options. If the console still does not load, confirm the app is running in local H2 mode and open:
+
+```text
+http://localhost:8080/h2-console
+```
+
+The H2 console is a local development tool, not a production feature.

@@ -118,3 +118,19 @@ Phase 9 adds basic production diagnostics:
 - Health probes expose liveness and readiness status for container and cloud-style runtime checks.
 - `/actuator/info` returns stable service metadata from application configuration.
 - Diagnostics do not change business API behavior.
+
+## Phase 10 Basic Security
+
+Phase 10 adds a simple Spring Security boundary:
+
+- `SecurityConfig` defines HTTP Basic authentication and role-based authorization.
+- In-memory demo users represent `USER` and `ADMIN` roles.
+- Health and diagnostic endpoints remain public for uptime checks.
+- Product and order read endpoints remain public for portfolio/demo workflows.
+- Product write endpoints require `ADMIN`.
+- Order creation requires `USER` or `ADMIN`.
+- Shipment creation requires `ADMIN`.
+- CSRF is disabled for this stateless REST API demo.
+- H2 console access remains available for local development.
+
+This phase intentionally avoids JWT, OAuth, database-backed users, frontend login, and production identity management.
