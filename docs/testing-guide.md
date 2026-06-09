@@ -290,3 +290,24 @@ Current security coverage verifies:
 - Existing business and workflow tests authenticate with the correct role so business behavior remains covered.
 
 Manual security curl commands live in `docs/youtube/10-basic-security.md`. Automated tests remain the main verification for security behavior.
+
+## Phase 11
+
+Run the full Java test suite:
+
+```bash
+mvn test
+```
+
+Phase 11 adds k6 performance smoke scripts that are separate from Maven tests.
+
+Current performance testing coverage includes:
+
+- Repeated `GET /products` traffic in `performance/k6/product-list.js`.
+- Authenticated `POST /products` traffic in `performance/k6/order-workflow.js`.
+- Authenticated `POST /orders` traffic in `performance/k6/order-workflow.js`.
+- `GET /orders/{id}` traffic in `performance/k6/order-workflow.js`.
+- Authenticated `POST /orders/{id}/ship` traffic in `performance/k6/order-workflow.js`.
+- Baseline expectations for request volume, average response time, p95 response time, and error rate.
+
+Manual performance commands live in `docs/youtube/11-performance-testing.md`. k6 scripts do not replace the automated Java test suite.

@@ -134,3 +134,14 @@ Phase 10 adds a simple Spring Security boundary:
 - H2 console access remains available for local development.
 
 This phase intentionally avoids JWT, OAuth, database-backed users, frontend login, and production identity management.
+
+## Phase 11 Performance Testing
+
+Phase 11 adds performance testing artifacts outside the Spring Boot application:
+
+- k6 scripts live under `performance/k6`.
+- `product-list.js` exercises repeated product list reads.
+- `order-workflow.js` exercises product creation, order creation, order lookup, and shipment creation.
+- Scripts use the Phase 10 HTTP Basic demo users for protected write operations.
+- Baseline expectations document request volume, average response time, p95 response time, and error rate.
+- Performance scripts are operational test assets and do not change application business behavior.

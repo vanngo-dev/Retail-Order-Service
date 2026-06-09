@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 11 - Performance Testing
+
+- Added k6 performance smoke scripts under `performance/k6`.
+- Added product list performance script for repeated `GET /products` traffic.
+- Added order workflow performance script covering product create, order create, order read, and shipment.
+- Added baseline expectations for request volume, average response time, p95 response time, and error rate.
+- Documented that k6 scripts are separate from Maven tests.
+- Updated README and project documentation.
+
 ## Phase 10 - Basic Security Exposure
 
 - Added Spring Security dependency.

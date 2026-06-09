@@ -20,6 +20,7 @@ Retail Order Service is a production-style Java/Spring Boot backend API that mod
 - JUnit 5 and Spring Boot Test
 - Docker and Docker Compose
 - GitHub Actions
+- k6 performance scripts
 
 ## Phase 0 - Project Setup
 
@@ -195,6 +196,19 @@ Demo users:
 | `admin` | `admin-password` | `USER`, `ADMIN` |
 
 These credentials are for local portfolio/demo use only. Manual security demo commands live in `docs/youtube/10-basic-security.md`.
+
+## Phase 11 - Performance Testing
+
+Added basic k6 performance tests for product listing and order workflow endpoints. Documented request volume, response times, and error rates to demonstrate exposure to performance testing.
+
+This phase includes:
+
+- `performance/k6/product-list.js` for repeated `GET /products` traffic
+- `performance/k6/order-workflow.js` for product create, order create, order read, and shipment workflow traffic
+- Baseline expectations for request volume, average response time, p95 response time, and error rate
+- Separation between Java automated tests and k6 performance smoke scripts
+
+Manual performance demo commands live in `docs/youtube/11-performance-testing.md`. Baseline expectations live in `performance/baseline-expectations.md`.
 
 ## Package Structure
 
@@ -411,6 +425,8 @@ Run only the Phase 10 security tests:
 ```bash
 mvn test -Dtest=SecurityIntegrationTest
 ```
+
+k6 performance scripts live under `performance/k6`. They are separate from Maven tests and are documented in `docs/youtube/11-performance-testing.md`.
 
 Package the application locally:
 

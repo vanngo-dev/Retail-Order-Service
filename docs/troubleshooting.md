@@ -284,3 +284,40 @@ http://localhost:8080/h2-console
 ```
 
 The H2 console is a local development tool, not a production feature.
+
+## k6 Command Is Not Available
+
+Install k6 and reopen the terminal so the command is available on PATH.
+
+Manual performance commands live in `docs/youtube/11-performance-testing.md`.
+
+## k6 Script Cannot Connect to the App
+
+Confirm the Spring Boot app is running and `BASE_URL` points to the correct host and port.
+
+Useful checks:
+
+- `GET /actuator/health` should return `UP`.
+- Local mode normally uses `http://localhost:8080`.
+- Docker Compose mode also maps the app to `http://localhost:8080` by default.
+
+## k6 Script Gets 401 or 403
+
+Phase 11 scripts call protected write endpoints from Phase 10.
+
+Check credentials and roles:
+
+- Product creation requires `admin` / `admin-password`.
+- Order creation can use `user` / `user-password`.
+- Shipment creation requires `admin` / `admin-password`.
+
+## k6 Results Look Slow Locally
+
+Local performance numbers are sensitive to laptop load, Docker, JVM warmup, antivirus scans, and database mode.
+
+Try:
+
+- Run one k6 script at a time.
+- Warm up the app with a few requests before recording results.
+- Compare average response time, p95 response time, request count, and error rate instead of relying on one request.
+- Treat local results as smoke-test baselines, not production service-level objectives.
