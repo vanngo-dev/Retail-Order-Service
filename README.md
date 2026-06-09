@@ -59,6 +59,21 @@ This phase includes:
 - Unit tests for order service business rules
 - Spring Boot integration tests for the Order API in `OrderApiIntegrationTest`
 
+## Phase 3 - Shipment Workflow
+
+Implemented shipment creation and order status transition from `CREATED` to `SHIPPED`. Added validation to prevent duplicate shipments and invalid order state transitions.
+
+This phase includes:
+
+- `Shipment` JPA entity with order reference, carrier, tracking number, shipped time, and creation timestamp
+- `ShipmentRepository` using Spring Data JPA
+- Request and response DTOs for shipping an order
+- `OrderService` shipping business operation
+- `POST /orders/{id}/ship` endpoint
+- Validation for missing carrier, missing tracking number, nonexistent orders, already shipped orders, and cancelled orders
+- Unit tests for shipment business rules
+- Spring Boot integration tests for the Shipment API in `ShipmentApiIntegrationTest`
+
 ## Package Structure
 
 ```text
@@ -136,6 +151,7 @@ Detailed manual demo commands live in `docs/youtube/01-product-api.md`. Reusable
 | GET | `/orders` | List orders |
 | GET | `/orders/{id}` | Get order by ID |
 | POST | `/orders` | Create order |
+| POST | `/orders/{id}/ship` | Ship an order |
 
 `GET /orders` supports optional query parameters:
 
@@ -148,7 +164,9 @@ Detailed manual demo commands live in `docs/youtube/01-product-api.md`. Reusable
 
 Order totals are calculated server-side. Phase 2 uses a simplified fixed `8.25%` tax rate for portfolio purposes.
 
-Detailed manual demo commands live in `docs/youtube/02-order-workflow.md`. Reusable API request examples live in `docs/api-examples.md`.
+Shipping is a business operation. It creates a shipment record and changes the order status from `CREATED` to `SHIPPED`.
+
+Detailed manual demo commands live in `docs/youtube/02-order-workflow.md` and `docs/youtube/03-shipment-workflow.md`. Reusable API request examples live in `docs/api-examples.md`.
 
 ## How to Run
 

@@ -11,17 +11,24 @@ import static org.mockito.Mockito.when;
 
 import com.example.retailorderservice.dto.request.CreateOrderItemRequest;
 import com.example.retailorderservice.dto.request.CreateOrderRequest;
+import com.example.retailorderservice.dto.request.ShipOrderRequest;
 import com.example.retailorderservice.dto.response.OrderResponse;
+import com.example.retailorderservice.dto.response.ShipmentResponse;
 import com.example.retailorderservice.entity.Order;
 import com.example.retailorderservice.entity.OrderStatus;
 import com.example.retailorderservice.entity.Product;
+import com.example.retailorderservice.entity.Shipment;
 import com.example.retailorderservice.exception.InsufficientInventoryException;
+import com.example.retailorderservice.exception.InvalidOrderStateException;
+import com.example.retailorderservice.exception.OrderNotFoundException;
 import com.example.retailorderservice.exception.ProductInactiveException;
 import com.example.retailorderservice.exception.ProductNotFoundException;
 import com.example.retailorderservice.repository.OrderRepository;
 import com.example.retailorderservice.repository.ProductRepository;
+import com.example.retailorderservice.repository.ShipmentRepository;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,11 +45,14 @@ class OrderServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private ShipmentRepository shipmentRepository;
+
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(orderRepository, productRepository);
+        orderService = new OrderService(orderRepository, productRepository, shipmentRepository);
     }
 
     @Test
@@ -157,6 +167,77 @@ class OrderServiceTest {
         assertThat(product.getQuantityAvailable()).isEqualTo(7);
     }
 
+    @Test
+    void shipsValidOrder() {
+        Order order = order(1L);
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(shipmentRepository.existsByOrder_Id(1L)).thenReturn(false);
+        when(shipmentRepository.save(any(Shipment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ShipmentResponse response = orderService.shipOrder(1L, shipRequest("UPS", "1Z999999999"));
+
+        assertThat(response.orderId()).isEqualTo(1L);
+        assertThat(response.carrier()).isEqualTo("UPS");
+        assertThat(response.trackingNumber()).isEqualTo("1Z999999999");
+        assertThat(response.shippedAt()).isNotNull();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.SHIPPED);
+        verify(shipmentRepository).save(any(Shipment.class));
+    }
+
+    @Test
+    void rejectsNonexistentOrderWhenShipping() {
+        when(orderRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.shipOrder(99L, shipRequest("UPS", "1Z999999999")))
+                .isInstanceOf(OrderNotFoundException.class)
+                .hasMessageContaining("99");
+        verify(shipmentRepository, never()).save(any(Shipment.class));
+    }
+
+    @Test
+    void rejectsAlreadyShippedOrder() {
+        Order order = order(1L);
+        order.markShipped();
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        assertThatThrownBy(() -> orderService.shipOrder(1L, shipRequest("UPS", "1Z999999999")))
+                .isInstanceOf(InvalidOrderStateException.class)
+                .hasMessageContaining("already been shipped");
+        verify(shipmentRepository, never()).save(any(Shipment.class));
+    }
+
+    @Test
+    void rejectsCancelledOrder() {
+        Order order = order(1L);
+        order.cancel();
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(shipmentRepository.existsByOrder_Id(1L)).thenReturn(false);
+
+        assertThatThrownBy(() -> orderService.shipOrder(1L, shipRequest("UPS", "1Z999999999")))
+                .isInstanceOf(InvalidOrderStateException.class)
+                .hasMessageContaining("Cancelled order cannot be shipped");
+        verify(shipmentRepository, never()).save(any(Shipment.class));
+    }
+
+    @Test
+    void rejectsMissingCarrier() {
+        assertThatThrownBy(() -> orderService.shipOrder(1L, shipRequest(" ", "1Z999999999")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Carrier is required");
+        verifyNoInteractions(shipmentRepository);
+    }
+
+    @Test
+    void rejectsMissingTrackingNumber() {
+        assertThatThrownBy(() -> orderService.shipOrder(1L, shipRequest("UPS", " ")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Tracking number is required");
+        verifyNoInteractions(shipmentRepository);
+    }
+
     private static CreateOrderRequest orderRequest(String customerEmail, CreateOrderItemRequest... items) {
         return new CreateOrderRequest(customerEmail, List.of(items));
     }
@@ -169,5 +250,15 @@ class OrderServiceTest {
         Product product = new Product(sku, name, name + " description", new BigDecimal(price), quantityAvailable, active);
         ReflectionTestUtils.setField(product, "id", id);
         return product;
+    }
+
+    private static ShipOrderRequest shipRequest(String carrier, String trackingNumber) {
+        return new ShipOrderRequest(carrier, trackingNumber);
+    }
+
+    private static Order order(Long id) {
+        Order order = new Order("ORD-TEST123", "customer@example.com", new BigDecimal("19.99"), new BigDecimal("1.65"), new BigDecimal("21.64"));
+        ReflectionTestUtils.setField(order, "id", id);
+        return order;
     }
 }

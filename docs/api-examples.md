@@ -174,3 +174,27 @@ Get order by ID:
 ```bash
 curl http://localhost:8080/orders/1
 ```
+
+Ship an order:
+
+```bash
+curl -X POST http://localhost:8080/orders/1/ship \
+  -H "Content-Type: application/json" \
+  -d '{
+    "carrier": "UPS",
+    "trackingNumber": "1Z999999999"
+  }'
+```
+
+Expected response shape:
+
+```json
+{
+  "id": 1,
+  "orderId": 1,
+  "carrier": "UPS",
+  "trackingNumber": "1Z999999999",
+  "shippedAt": "2026-06-04T12:00:00Z",
+  "createdAt": "2026-06-04T12:00:00Z"
+}
+```

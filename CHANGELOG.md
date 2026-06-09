@@ -1,5 +1,17 @@
 # Changelog
 
+## Phase 3 - Shipment Workflow
+
+- Added `Shipment` JPA entity.
+- Added Spring Data `ShipmentRepository`.
+- Added ship order request DTO and shipment response DTO.
+- Added shipment mapper.
+- Added order shipping business operation to `OrderService`.
+- Added `POST /orders/{id}/ship` endpoint.
+- Added invalid order state validation for already shipped and cancelled orders.
+- Added shipment service unit coverage and API integration tests.
+- Updated README and project documentation.
+
 ## Phase 2 - Order Workflow
 
 - Added `Order` and `OrderItem` JPA entities.

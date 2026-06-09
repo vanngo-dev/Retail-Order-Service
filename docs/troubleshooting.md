@@ -88,3 +88,22 @@ The product exists, but it cannot be ordered in its current state. Common causes
 ## Order Totals Look Slightly Rounded
 
 Phase 2 uses a simplified fixed `8.25%` tax rate for portfolio purposes. Monetary values are rounded to two decimals with standard half-up rounding.
+
+## Ship Order Returns 400 Bad Request
+
+Check the request body:
+
+- `carrier` is required.
+- `trackingNumber` is required.
+
+## Ship Order Returns 404 Not Found
+
+The order ID does not exist. Create an order first, then retry the shipment request.
+
+## Ship Order Returns 409 Conflict
+
+The order exists, but it cannot be shipped in its current state. Common causes:
+
+- The order has already been shipped.
+- The order is cancelled.
+- The order is not in `CREATED` status.

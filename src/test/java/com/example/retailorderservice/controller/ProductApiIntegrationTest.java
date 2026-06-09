@@ -16,6 +16,7 @@ import com.example.retailorderservice.entity.Product;
 import com.example.retailorderservice.repository.OrderItemRepository;
 import com.example.retailorderservice.repository.OrderRepository;
 import com.example.retailorderservice.repository.ProductRepository;
+import com.example.retailorderservice.repository.ShipmentRepository;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,12 @@ class ProductApiIntegrationTest {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private ShipmentRepository shipmentRepository;
+
     @BeforeEach
     void cleanDatabase() {
+        shipmentRepository.deleteAll();
         orderItemRepository.deleteAll();
         orderRepository.deleteAll();
         productRepository.deleteAll();

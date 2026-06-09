@@ -2,20 +2,27 @@ package com.example.retailorderservice.service;
 
 import com.example.retailorderservice.dto.request.CreateOrderItemRequest;
 import com.example.retailorderservice.dto.request.CreateOrderRequest;
+import com.example.retailorderservice.dto.request.ShipOrderRequest;
 import com.example.retailorderservice.dto.response.OrderResponse;
+import com.example.retailorderservice.dto.response.ShipmentResponse;
 import com.example.retailorderservice.entity.Order;
 import com.example.retailorderservice.entity.OrderItem;
 import com.example.retailorderservice.entity.OrderStatus;
 import com.example.retailorderservice.entity.Product;
+import com.example.retailorderservice.entity.Shipment;
 import com.example.retailorderservice.exception.InsufficientInventoryException;
+import com.example.retailorderservice.exception.InvalidOrderStateException;
 import com.example.retailorderservice.exception.OrderNotFoundException;
 import com.example.retailorderservice.exception.ProductInactiveException;
 import com.example.retailorderservice.exception.ProductNotFoundException;
 import com.example.retailorderservice.mapper.OrderMapper;
+import com.example.retailorderservice.mapper.ShipmentMapper;
 import com.example.retailorderservice.repository.OrderRepository;
 import com.example.retailorderservice.repository.ProductRepository;
+import com.example.retailorderservice.repository.ShipmentRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,10 +43,16 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final ShipmentRepository shipmentRepository;
 
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
+    public OrderService(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            ShipmentRepository shipmentRepository
+    ) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.shipmentRepository = shipmentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -85,6 +98,19 @@ public class OrderService {
         requestedQuantitiesByProductId.forEach((productId, quantity) -> productsById.get(productId).deductInventory(quantity));
 
         return OrderMapper.toResponse(orderRepository.save(order));
+    }
+
+    public ShipmentResponse shipOrder(Long orderId, ShipOrderRequest request) {
+        String carrier = normalizeRequired(request.carrier(), "Carrier is required");
+        String trackingNumber = normalizeRequired(request.trackingNumber(), "Tracking number is required");
+        Order order = findOrder(orderId);
+
+        validateOrderCanBeShipped(order);
+
+        Shipment shipment = new Shipment(order, carrier, trackingNumber, Instant.now());
+        order.markShipped();
+
+        return ShipmentMapper.toResponse(shipmentRepository.save(shipment));
     }
 
     private Order findOrder(Long id) {
@@ -138,6 +164,18 @@ public class OrderService {
         }
         if (product.getQuantityAvailable() < requestedQuantity) {
             throw new InsufficientInventoryException(product.getId(), requestedQuantity, product.getQuantityAvailable());
+        }
+    }
+
+    private void validateOrderCanBeShipped(Order order) {
+        if (order.getStatus() == OrderStatus.SHIPPED || shipmentRepository.existsByOrder_Id(order.getId())) {
+            throw new InvalidOrderStateException("Order has already been shipped: " + order.getId());
+        }
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new InvalidOrderStateException("Cancelled order cannot be shipped: " + order.getId());
+        }
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new InvalidOrderStateException("Only CREATED orders can be shipped: " + order.getId());
         }
     }
 

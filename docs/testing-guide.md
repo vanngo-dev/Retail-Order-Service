@@ -82,3 +82,29 @@ Current order coverage verifies:
 - Inactive products and insufficient inventory return `409`.
 
 Manual curl examples are demo scripts in `docs/youtube/02-order-workflow.md`. The important endpoint behavior is automated in `OrderApiIntegrationTest`.
+
+## Phase 3
+
+Run the test suite:
+
+```bash
+mvn test
+```
+
+Current shipment coverage verifies:
+
+- `OrderService` ships a valid `CREATED` order.
+- A shipment record is created.
+- Order status changes to `SHIPPED`.
+- Nonexistent orders are rejected.
+- Already shipped orders are rejected.
+- Cancelled orders are rejected.
+- Missing carrier is rejected.
+- Missing tracking number is rejected.
+- `POST /orders/{id}/ship` ships an order through the HTTP API.
+- The shipped order can be read back with status `SHIPPED`.
+- Duplicate shipment requests return `409`.
+- Invalid shipment payloads return `400`.
+- Unknown order IDs return `404`.
+
+Manual curl examples are demo scripts in `docs/youtube/03-shipment-workflow.md`. The important endpoint behavior is automated in `ShipmentApiIntegrationTest`.

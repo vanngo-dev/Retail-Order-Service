@@ -1,7 +1,9 @@
 package com.example.retailorderservice.controller;
 
 import com.example.retailorderservice.dto.request.CreateOrderRequest;
+import com.example.retailorderservice.dto.request.ShipOrderRequest;
 import com.example.retailorderservice.dto.response.OrderResponse;
+import com.example.retailorderservice.dto.response.ShipmentResponse;
 import com.example.retailorderservice.entity.OrderStatus;
 import com.example.retailorderservice.service.OrderService;
 import jakarta.validation.Valid;
@@ -47,6 +49,17 @@ public class OrderController {
         OrderResponse response = orderService.createOrder(request);
         return ResponseEntity
                 .created(URI.create("/orders/" + response.id()))
+                .body(response);
+    }
+
+    @PostMapping("/{id}/ship")
+    public ResponseEntity<ShipmentResponse> shipOrder(
+            @PathVariable Long id,
+            @Valid @RequestBody ShipOrderRequest request
+    ) {
+        ShipmentResponse response = orderService.shipOrder(id, request);
+        return ResponseEntity
+                .created(URI.create("/orders/" + id + "/shipment"))
                 .body(response);
     }
 }

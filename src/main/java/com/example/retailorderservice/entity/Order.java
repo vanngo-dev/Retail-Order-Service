@@ -85,6 +85,16 @@ public class Order {
         items.add(item);
     }
 
+    public void markShipped() {
+        status = OrderStatus.SHIPPED;
+        updatedAt = Instant.now();
+    }
+
+    public void cancel() {
+        status = OrderStatus.CANCELLED;
+        updatedAt = Instant.now();
+    }
+
     public Long getId() {
         return id;
     }
