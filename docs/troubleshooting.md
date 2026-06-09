@@ -64,3 +64,27 @@ On some Windows file systems, Git may refuse commands with a `dubious ownership`
 ```bash
 git config --global --add safe.directory D:/MyApps/Java/RetailOrderService
 ```
+
+## Order Create Returns 400 Bad Request
+
+Check the request body:
+
+- `customerEmail` is required and must be a valid email address.
+- `items` must contain at least one order item.
+- Each item must include `productId`.
+- Each item must have `quantity` greater than zero.
+
+## Order Create Returns 404 Not Found
+
+At least one requested `productId` does not exist. Create the product first, then retry the order.
+
+## Order Create Returns 409 Conflict
+
+The product exists, but it cannot be ordered in its current state. Common causes:
+
+- The product is inactive.
+- The requested quantity is greater than available inventory.
+
+## Order Totals Look Slightly Rounded
+
+Phase 2 uses a simplified fixed `8.25%` tax rate for portfolio purposes. Monetary values are rounded to two decimals with standard half-up rounding.

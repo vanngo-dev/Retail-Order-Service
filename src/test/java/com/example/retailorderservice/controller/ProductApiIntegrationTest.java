@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.retailorderservice.entity.Product;
+import com.example.retailorderservice.repository.OrderItemRepository;
+import com.example.retailorderservice.repository.OrderRepository;
 import com.example.retailorderservice.repository.ProductRepository;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +34,16 @@ class ProductApiIntegrationTest {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
     @BeforeEach
     void cleanDatabase() {
+        orderItemRepository.deleteAll();
+        orderRepository.deleteAll();
         productRepository.deleteAll();
     }
 

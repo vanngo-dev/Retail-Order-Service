@@ -53,3 +53,32 @@ Current product coverage verifies:
 - Unknown product IDs return `404`.
 
 Manual curl examples are demo scripts in `docs/youtube/01-product-api.md`. The important endpoint behavior is automated in `ProductApiIntegrationTest`.
+
+## Phase 2
+
+Run the test suite:
+
+```bash
+mvn test
+```
+
+Current order coverage verifies:
+
+- `OrderService` creates an order with one item.
+- `OrderService` creates an order with multiple items.
+- Missing customer email is rejected.
+- Empty item lists are rejected.
+- Nonexistent products are rejected.
+- Inactive products are rejected.
+- Insufficient inventory is rejected.
+- Inventory is deducted when an order is created.
+- Subtotal, fixed `8.25%` tax, total, and line totals are calculated.
+- Product price, name, and SKU are snapshotted into order items.
+- `POST /orders` creates orders through the HTTP API.
+- `GET /orders/{id}` returns an order by ID.
+- `GET /orders?status=...&customerEmail=...&page=...&size=...` covers filtering and pagination.
+- Invalid order payloads return `400`.
+- Nonexistent products and orders return `404`.
+- Inactive products and insufficient inventory return `409`.
+
+Manual curl examples are demo scripts in `docs/youtube/02-order-workflow.md`. The important endpoint behavior is automated in `OrderApiIntegrationTest`.

@@ -33,3 +33,16 @@ Phase 1 adds product management with SQL persistence:
 - `ProductController` exposes REST endpoints under `/products`.
 
 Delete operations are soft deletes: the row remains in the database and `active` is set to `false`.
+
+## Phase 2 Order Workflow
+
+Phase 2 adds order creation with line items:
+
+- `Order` stores customer email, order number, status, subtotal, tax, total, and audit timestamps.
+- `OrderItem` stores product ID plus product SKU, name, and unit price snapshots.
+- `OrderService` validates products, active status, inventory availability, item quantities, and customer email.
+- The service calculates line totals, subtotal, fixed `8.25%` tax, and total server-side.
+- Product inventory is deducted in the same transaction as order creation.
+- Order lookup and listing are exposed under `/orders`.
+
+Shipment state transitions remain planned for Phase 3 and are not implemented in Phase 2.

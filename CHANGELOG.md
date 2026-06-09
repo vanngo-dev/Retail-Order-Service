@@ -1,5 +1,17 @@
 # Changelog
 
+## Phase 2 - Order Workflow
+
+- Added `Order` and `OrderItem` JPA entities.
+- Added `OrderStatus` enum.
+- Added Spring Data repositories for orders and order items.
+- Added order create request DTOs and order response DTOs.
+- Added order service business rules for product lookup, active product validation, inventory validation, snapshots, totals, and inventory deduction.
+- Added REST endpoints for order list, lookup, and creation.
+- Added fixed `8.25%` tax calculation for portfolio/demo purposes.
+- Added order service unit tests and API integration tests.
+- Updated README and project documentation.
+
 ## Phase 1 - Product API
 
 - Added `Product` JPA entity with SKU, name, description, price, inventory quantity, active status, and audit timestamps.

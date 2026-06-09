@@ -43,6 +43,22 @@ This phase includes:
 - Unit tests for product service business rules
 - Spring Boot integration tests for the Product API in `ProductApiIntegrationTest`
 
+## Phase 2 - Order Workflow
+
+Implemented order creation with order items, product lookup, inventory validation, price/name/SKU snapshots, subtotal/tax/total calculation, and inventory deduction.
+
+This phase includes:
+
+- `Order` and `OrderItem` JPA entities
+- `OrderStatus` enum with lifecycle statuses
+- `OrderRepository` and `OrderItemRepository`
+- Request and response DTOs for order creation and lookup
+- `OrderService` business rules for product lookup, active product checks, inventory validation, snapshotting, totals, and inventory deduction
+- `OrderController` REST endpoints under `/orders`
+- Fixed `8.25%` tax calculation for portfolio/demo purposes
+- Unit tests for order service business rules
+- Spring Boot integration tests for the Order API in `OrderApiIntegrationTest`
+
 ## Package Structure
 
 ```text
@@ -112,6 +128,27 @@ Example response:
 | `size` | `20` | Select page size |
 
 Detailed manual demo commands live in `docs/youtube/01-product-api.md`. Reusable API request examples live in `docs/api-examples.md`.
+
+### Orders
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/orders` | List orders |
+| GET | `/orders/{id}` | Get order by ID |
+| POST | `/orders` | Create order |
+
+`GET /orders` supports optional query parameters:
+
+| Parameter | Example | Purpose |
+|---|---|---|
+| `status` | `CREATED` | Filter by order status |
+| `customerEmail` | `customer@example.com` | Filter by customer email |
+| `page` | `0` | Select result page |
+| `size` | `20` | Select page size |
+
+Order totals are calculated server-side. Phase 2 uses a simplified fixed `8.25%` tax rate for portfolio purposes.
+
+Detailed manual demo commands live in `docs/youtube/02-order-workflow.md`. Reusable API request examples live in `docs/api-examples.md`.
 
 ## How to Run
 

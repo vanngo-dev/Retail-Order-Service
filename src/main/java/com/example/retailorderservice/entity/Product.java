@@ -98,6 +98,11 @@ public class Product {
         updatedAt = Instant.now();
     }
 
+    public void deductInventory(int quantity) {
+        quantityAvailable -= quantity;
+        updatedAt = Instant.now();
+    }
+
     public Long getId() {
         return id;
     }

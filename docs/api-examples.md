@@ -111,3 +111,66 @@ Deactivate a product:
 ```bash
 curl -X DELETE http://localhost:8080/products/1
 ```
+
+## Orders
+
+Create an order:
+
+```bash
+curl -X POST http://localhost:8080/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerEmail": "customer@example.com",
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 2
+      }
+    ]
+  }'
+```
+
+Expected response shape:
+
+```json
+{
+  "id": 1,
+  "orderNumber": "ORD-1234ABCD",
+  "customerEmail": "customer@example.com",
+  "status": "CREATED",
+  "subtotal": 39.98,
+  "tax": 3.30,
+  "total": 43.28,
+  "createdAt": "2026-06-04T12:00:00Z",
+  "updatedAt": "2026-06-04T12:00:00Z",
+  "items": [
+    {
+      "id": 1,
+      "productId": 1,
+      "skuSnapshot": "HAMMER-001",
+      "productNameSnapshot": "Steel Hammer",
+      "unitPriceSnapshot": 19.99,
+      "quantity": 2,
+      "lineTotal": 39.98
+    }
+  ]
+}
+```
+
+List orders:
+
+```bash
+curl http://localhost:8080/orders
+```
+
+List created orders for a customer:
+
+```bash
+curl "http://localhost:8080/orders?status=CREATED&customerEmail=customer@example.com&page=0&size=20"
+```
+
+Get order by ID:
+
+```bash
+curl http://localhost:8080/orders/1
+```
